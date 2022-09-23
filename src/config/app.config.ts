@@ -1,13 +1,17 @@
-import { registerAs } from '@nestjs/config';
+import { registerAs } from '@nestjs/config'
 
-export default registerAs('app', () => ({
+export interface IAppConfig {
+  nodeEnv: string
+  debug: boolean
+  name?: string
+  port: number
+  apiPrefix: string
+}
+
+export default registerAs<IAppConfig>('app', () => ({
   nodeEnv: process.env.NODE_ENV,
+  debug: process.env.NODE_ENV !== 'production',
   name: process.env.APP_NAME,
-  workingDirectory: process.env.PWD || process.cwd(),
-  frontendDomain: process.env.FRONTEND_DOMAIN,
-  backendDomain: process.env.BACKEND_DOMAIN,
   port: parseInt(process.env.APP_PORT || process.env.PORT, 10) || 3000,
   apiPrefix: process.env.API_PREFIX || 'api',
-  fallbackLanguage: process.env.APP_FALLBACK_LANGUAGE || 'en',
-  headerLanguage: process.env.APP_HEADER_LANGUAGE || 'x-custom-lang',
-}));
+}))

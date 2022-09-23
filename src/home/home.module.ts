@@ -1,10 +1,13 @@
-import { Module } from '@nestjs/common';
-import { HomeService } from './home.service';
-import { HomeController } from './home.controller';
-import { ConfigModule } from '@nestjs/config';
+import { Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+
+import { PornScraperModule } from '@clients/porn-scraper.module'
+
+import { HomeController } from './home.controller'
+import { HomeService } from './home.service'
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, PornScraperModule],
   controllers: [HomeController],
   providers: [HomeService],
 })

@@ -3,7 +3,7 @@ import {
   HttpStatus,
   ValidationError,
   ValidationPipeOptions,
-} from '@nestjs/common';
+} from '@nestjs/common'
 
 const validationOptions: ValidationPipeOptions = {
   transform: true,
@@ -25,6 +25,6 @@ const validationOptions: ValidationPipeOptions = {
       },
       HttpStatus.UNPROCESSABLE_ENTITY,
     ),
-};
+}
 
-export default validationOptions;
+export default validationOptions
