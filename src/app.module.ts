@@ -3,29 +3,25 @@ import { ConfigModule } from '@nestjs/config'
 import { GraphQLModule } from '@nestjs/graphql'
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius'
 
-import { PornScraperModule } from '@clients/porn-scraper.module'
+import { GraphqlConfigService } from '@_config-services/graphql-config.service'
+import Configs from '@_config/index'
+import { DatabaseModule } from '@_database/database.module'
 
-import configs from '@configs'
-
-import { DatabaseModule } from './database/database.module'
-import { GraphqlConfigService } from './graphql/graphql-config.service'
-import { HomeModule } from './home/home.module'
+import { FilesModule } from './files/files.module'
+import { VideosModule } from './videos/videos.module'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: configs,
-      envFilePath: ['.env'],
+      load: Configs,
+      envFilePath: ['.env', '.env.default'],
     }),
     GraphQLModule.forRootAsync<MercuriusDriverConfig>({
       driver: MercuriusDriver,
-      imports: [DatabaseModule],
+      imports: [DatabaseModule, FilesModule, VideosModule],
       useClass: GraphqlConfigService,
     }),
-    PornScraperModule,
-
-    HomeModule,
   ],
 })
 export class AppModule {}

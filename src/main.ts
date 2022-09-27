@@ -7,17 +7,17 @@ import {
 } from '@nestjs/platform-fastify'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { useContainer } from 'class-validator'
-import DayJS from 'dayjs'
-import DayJSUtc from 'dayjs/plugin/utc'
+import * as DayJS from 'dayjs'
+import * as DayJS_UTC from 'dayjs/plugin/utc'
 
-import { IAppConfig } from '@config/app.config'
-import { ISwaggerConfig } from '@config/swagger.config'
+import { IAppConfig } from '@_config/app.config'
+import { ISwaggerConfig } from '@_config/swagger.config'
 
 import { AppModule } from './app.module'
 // import { SerializerInterceptor } from './utils/serializer.interceptor'
 import validationOptions from './utils/validation-options'
 
-DayJS.extend(DayJSUtc)
+DayJS.extend(DayJS_UTC)
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -33,9 +33,7 @@ async function bootstrap() {
   const swaggerConfig = configService.get<ISwaggerConfig>('swagger')
 
   app.enableShutdownHooks()
-  app.setGlobalPrefix(configService.get('app.apiPrefix'), {
-    exclude: ['/'],
-  })
+  app.setGlobalPrefix(configService.get('app.apiPrefix'))
   app.enableVersioning({
     type: VersioningType.URI,
   })

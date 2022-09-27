@@ -5,7 +5,13 @@ import { PrismaClient } from '@prisma/client'
   providers: [
     {
       provide: PrismaClient,
-      useClass: PrismaClient,
+      useFactory: () => {
+        const prisma = new PrismaClient()
+
+        // prisma.$use()
+
+        return prisma
+      },
     },
   ],
   exports: [PrismaClient],

@@ -2,6 +2,9 @@
 /dist
 /node_modules
 
+# No NPM
+package-lock.json
+
 # Logs
 logs
 *.log

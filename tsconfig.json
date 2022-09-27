@@ -18,9 +18,11 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@clients/*": ["clients/*"],
-      "@configs": ["config"],
-      "@config/*": ["config/*"],
+      "@_config-services/*": ["config-services/*"],
+      "@_clients/*": ["clients/*"],
+      "@_config/*": ["config/*"],
+      "@_database/*": ["database/*"],
+      "@_utils/*": ["utils/*"]
     }
   }
 }

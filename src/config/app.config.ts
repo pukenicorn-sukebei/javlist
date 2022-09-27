@@ -13,5 +13,5 @@ export default registerAs<IAppConfig>('app', () => ({
   debug: process.env.NODE_ENV !== 'production',
   name: process.env.APP_NAME,
   port: parseInt(process.env.APP_PORT || process.env.PORT, 10) || 3000,
-  apiPrefix: process.env.API_PREFIX || 'api',
+  apiPrefix: process.env.API_PREFIX,
 }))

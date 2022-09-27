@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator nexusPrisma {
+  provider = "nexus-prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Video {
+  id          String     @id @default(uuid())
+  code        String     @unique
+  name        String?
+  releaseDate DateTime?
+  length      Int
+  makerId     String
+  labelId     String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  coverUrlKey String
+  maker       VideoMaker @relation(fields: [makerId], references: [id])
+  label       VideoLabel @relation(fields: [labelId], references: [id])
+  tags        VideoTag[]
+  directors   Person[]   @relation("VideosDirected")
+  actors      Person[]   @relation("VideosStarred")
+}
+
+model VideoTag {
+  id     String  @id @default(uuid())
+  name   String  @unique
+  videos Video[]
+}
+
+model Person {
+  id        String        @id @default(uuid())
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  aliases   PersonAlias[]
+  directed  Video[]       @relation("VideosDirected")
+  starred   Video[]       @relation("VideosStarred")
+}
+
+model PersonAlias {
+  id       String @id @default(uuid())
+  personId String
+  alias    String @unique
+  person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+}
+
+model VideoMaker {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  videos    Video[]
+}
+
+model VideoLabel {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  videos    Video[]
+}
+
+model File {
+  id           String   @id @default(uuid())
+  originalName String
+  originalPath String?
+  uploadedPath String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

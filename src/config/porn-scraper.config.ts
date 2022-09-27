@@ -1,9 +1,9 @@
 import { registerAs } from '@nestjs/config'
 
-import { Configuration } from '@clients/porn-scraper'
+import { Configuration } from '@_clients/porn-scraper'
 
 export default registerAs<Configuration>(
-  'porn-scraper',
+  'porn-scraper-client',
   () =>
     new Configuration({
       basePath: process.env.PORN_SCRAPER_BASEPATH,

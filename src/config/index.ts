@@ -1,5 +1,6 @@
-import appConfig from '@config/app.config'
-import pornScraperConfig from '@config/porn-scraper.config'
-import swaggerConfig from '@config/swagger.config'
+import appConfig from '@_config/app.config'
+import pornScraperConfig from '@_config/porn-scraper.config'
+import s3Config from '@_config/s3.config'
+import swaggerConfig from '@_config/swagger.config'
 
-export default [appConfig, pornScraperConfig, swaggerConfig]
+export default [appConfig, s3Config, pornScraperConfig, swaggerConfig]
