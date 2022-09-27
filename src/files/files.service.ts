@@ -7,9 +7,10 @@ import {
 import { PutObjectRequest } from '@aws-sdk/client-s3/dist-types/models/models_0'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { HttpService } from '@nestjs/axios'
-import { Injectable } from '@nestjs/common'
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PrismaClient } from '@prisma/client'
+import { Cache } from 'cache-manager'
 import * as Path from 'path'
 import * as UUID from 'uuid'
 
@@ -18,6 +19,8 @@ import { IS3Config } from '@_config/s3.config'
 @Injectable()
 export class FilesService {
   constructor(
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
     private readonly prisma: PrismaClient,
@@ -70,13 +73,25 @@ export class FilesService {
     key: string,
     age?: number,
   ): Promise<string> {
-    return getSignedUrl(
+    const cacheKey = `FILES->${bucket}->${key}`
+
+    const cacheRes = await this.cacheManager.get<string>(cacheKey)
+
+    if (cacheRes) {
+      return cacheRes
+    }
+
+    const preSignedUrl = await getSignedUrl(
       this.s3Client,
       new GetObjectCommand({ Bucket: bucket, Key: key }),
       {
         expiresIn: age,
       },
     )
+
+    await this.cacheManager.set(cacheKey, preSignedUrl, { ttl: age * 0.75 })
+
+    return preSignedUrl
   }
 
   private async _delete(bucket: string, key: string): Promise<void> {
