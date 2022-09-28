@@ -1,19 +1,29 @@
-FROM node:16.17.0
+FROM node:alpine as base
 
-RUN npm i -g @nestjs/cli typescript ts-node
+ENV NODE_ENV=production
 
-COPY package*.json /tmp/app/
-RUN cd /tmp/app && npm install
+WORKDIR /app
 
-COPY . /usr/src/app
-RUN cp -a /tmp/app/node_modules /usr/src/app
-COPY ./wait-for-it.sh /opt/wait-for-it.sh
-COPY ./startup.dev.sh /opt/startup.dev.sh
-RUN sed -i 's/\r//g' /opt/wait-for-it.sh
-RUN sed -i 's/\r//g' /opt/startup.dev.sh
+COPY package.json yarn.lock nest-cli.json ./
+COPY prisma .
 
-WORKDIR /usr/src/app
-RUN rm -rf .env && cp env-example .env
-RUN npm run build
+///////////////////////////////////////////////////////////////////////////
 
-CMD ["/bin/bash", "/opt/startup.dev.sh"]
+FROM base as builder
+RUN yarn install --non-interactive --frozen-lockfile --ignore-scripts
+
+COPY tsconfig*.json openapitools.json ./
+COPY src .
+
+RUN yarn build
+
+///////////////////////////////////////////////////////////////////////////
+
+FROM base
+RUN yarn install --non-interactive --frozen-lockfile --ignore-scripts --production
+
+COPY --from=builder /app/dist /app/dist
+COPY .env.default .
+
+ENTRYPOINT ["yarn"]
+CMD ["start:prod"]

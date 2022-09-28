@@ -12,7 +12,8 @@
     "migration:pull": "prisma db pull",
     "migration:reset": "prisma migrate reset",
     "migration:run": "prisma migrate deploy",
-    "generate": "yarn run prisma generate && yarn run generate:porn-scraper-client",
+    "generate": "yarn run prisma generate && yarn run generate:client",
+    "generate:client": "yarn run generate:porn-scraper-client",
     "generate:porn-scraper-client": "openapi-generator-cli generate -g typescript-nestjs --additional-properties=serviceSuffix=ScraperService,supportsES6=true -i https://porn.pukenicorn.com/scraper/openapi.json -o src/clients/porn-scraper",
     "prebuild": "rimraf dist",
     "build": "nest build",
@@ -60,7 +61,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@nestjs/cli": "9.1.3",
+    "@nestjs/cli": "^9.1.4",
     "@nestjs/schematics": "9.0.3",
     "@nestjs/testing": "9.1.1",
     "@openapitools/openapi-generator-cli": "^2.5.2",
