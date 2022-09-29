@@ -3,7 +3,7 @@
 /test
 /generated
 
-src/utils/testing
+**/utils/testing
 *.spec.ts
 
 Dockerfile
