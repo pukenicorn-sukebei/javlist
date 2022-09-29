@@ -17,7 +17,6 @@ RUN SKIP_POSTINSTALL=1 yarn install --non-interactive --frozen-lockfile
 COPY tsconfig*.json openapitools.json ./
 COPY src ./src
 
-RUN ls -la ./node_modules/.bin >&2
 RUN yarn generate && yarn build
 
 ######################################################################################
