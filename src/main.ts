@@ -52,6 +52,6 @@ async function bootstrap() {
     SwaggerModule.setup(swaggerConfig.path, app, document)
   }
 
-  await app.listen(appConfig.port)
+  await app.listen(appConfig.port, '0.0.0.0')
 }
 void bootstrap()
