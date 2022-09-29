@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { GraphQLModule } from '@nestjs/graphql'
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius'
+import { LoggerModule } from 'nestjs-pino'
 
 import { GraphqlConfigService } from '@_config-services/graphql-config.service'
 import Configs from '@_config/index'
@@ -12,6 +13,7 @@ import { VideosModule } from './videos/videos.module'
 
 @Module({
   imports: [
+    LoggerModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       load: Configs,
