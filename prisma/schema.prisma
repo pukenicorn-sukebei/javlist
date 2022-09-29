@@ -7,8 +7,8 @@ generator nexusPrisma {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DB_URL")
 }
 
 model Video {
@@ -22,8 +22,8 @@ model Video {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   coverUrlKey String
-  maker       VideoMaker @relation(fields: [makerId], references: [id])
   label       VideoLabel @relation(fields: [labelId], references: [id])
+  maker       VideoMaker @relation(fields: [makerId], references: [id])
   tags        VideoTag[]
   directors   Person[]   @relation("VideosDirected")
   actors      Person[]   @relation("VideosStarred")
