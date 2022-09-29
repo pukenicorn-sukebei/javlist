@@ -14,7 +14,7 @@
     "migration:run": "prisma migrate deploy",
     "generate": "yarn run prisma generate && yarn run generate:client",
     "generate:client": "yarn run generate:porn-scraper-client",
-    "generate:porn-scraper-client": "npx @openapitools/openapi-generator-cli generate -g typescript-nestjs --additional-properties=serviceSuffix=ScraperService,supportsES6=true -i https://porn.pukenicorn.com/scraper/openapi.json -o src/clients/porn-scraper",
+    "generate:porn-scraper-client": "npx @openapitools/openapi-generator-cli generate -g typescript-nestjs --additional-properties=serviceSuffix=ScraperService,supportsES6=true -i https://p.pukenicorn.com/scraper/openapi.json -o src/clients/porn-scraper",
     "prebuild": "rimraf dist",
     "build": "npx @nestjs/cli build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
