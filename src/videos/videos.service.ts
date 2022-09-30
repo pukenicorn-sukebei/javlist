@@ -112,6 +112,7 @@ export class VideosService {
   private async _fetchVideoFromScraper(
     code: string,
   ): Promise<VideoWithInclude> {
+    // TODO setup queue for request to limit max simultaneous scrape
     const scraperResult = await this.pornScraperService.getByCode(code)
 
     const data = scraperResult.data

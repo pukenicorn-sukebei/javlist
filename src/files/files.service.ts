@@ -61,6 +61,7 @@ export class FilesService {
     key: string,
     data: PutObjectRequest['Body'] | string | Uint8Array | Buffer,
   ): Promise<string> {
+    // TODO save entry to db
     await this.s3Client.send(
       new PutObjectCommand({ Bucket: bucket, Key: key, Body: data }),
     )
@@ -81,6 +82,7 @@ export class FilesService {
       return cacheRes
     }
 
+    // TODO return cdn url from env if set
     const preSignedUrl = await getSignedUrl(
       this.s3Client,
       new GetObjectCommand({ Bucket: bucket, Key: key }),
