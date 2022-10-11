@@ -1,6 +1,7 @@
 name: Build image to ghcr
 
 permissions:
+  pull-requests: read
   contents: read
   packages: write
 
