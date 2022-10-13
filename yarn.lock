@@ -1376,7 +1376,7 @@
   resolved "https://registry.npmjs.org/@fastify/accept-negotiator/-/accept-negotiator-1.0.0.tgz"
   integrity sha512-4R/N2KfYeld7A5LGkai+iUFMahXcxxYbDp+XS2B1yuL3cdmZLJ9TlCnNzT3q5xFTqsYm0GPpinLUwfSwjcVjyA==
 
-"@fastify/ajv-compiler@^3.1.1", "@fastify/ajv-compiler@^3.3.1":
+"@fastify/ajv-compiler@^3.3.1":
   version "3.3.1"
   resolved "https://registry.npmjs.org/@fastify/ajv-compiler/-/ajv-compiler-3.3.1.tgz"
   integrity sha512-IRnids8lblQ8e1i8h4JLyfJmebXE+ohcj8x8X/+Ew6ZB4H0Ui05z5YL6q5FOcl0zItVpu4adRzeyVNNUwmduIg==
@@ -1403,7 +1403,7 @@
   resolved "https://registry.npmjs.org/@fastify/error/-/error-3.0.0.tgz"
   integrity sha512-dPRyT40GiHRzSCll3/Jn2nPe25+E1VXc9tDwRAIKwFCxd5Np5wzgz1tmooWG3sV0qKgrBibihVoCna2ru4SEFg==
 
-"@fastify/fast-json-stringify-compiler@^4.0.0", "@fastify/fast-json-stringify-compiler@^4.1.0":
+"@fastify/fast-json-stringify-compiler@^4.1.0":
   version "4.1.0"
   resolved "https://registry.npmjs.org/@fastify/fast-json-stringify-compiler/-/fast-json-stringify-compiler-4.1.0.tgz"
   integrity sha512-cTKBV2J9+u6VaKDhX7HepSfPSzw+F+TSd+k0wzifj4rG+4E5PjSFJCk19P8R6tr/72cuzgGd+mbB3jFT6lvAgw==
@@ -1914,15 +1914,15 @@
   dependencies:
     tslib "2.4.0"
 
-"@nestjs/platform-fastify@^9.1.2":
-  version "9.1.2"
-  resolved "https://registry.npmjs.org/@nestjs/platform-fastify/-/platform-fastify-9.1.2.tgz"
-  integrity sha512-BmyFTtScg4sHdFacLLrDEVGRMh+dw8hIBLqsNArerkj3/0k9IUWC2pY6Wv62kfOV27xeUJw0lLfreGptfpvqcQ==
+"@nestjs/platform-fastify@^9.1.4":
+  version "9.1.4"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-fastify/-/platform-fastify-9.1.4.tgz#9acbb2b117591cfd089fa275c0c227f4b203999c"
+  integrity sha512-RRl8owsL4svCSOz1andhE6vIHTVupjxAZz/KXwR6KzhW7Iuj8T80jVeOzQiccfY1uJEhojt5OL3bCKWkkc573A==
   dependencies:
     "@fastify/cors" "8.1.0"
     "@fastify/formbody" "7.3.0"
     "@fastify/middie" "8.0.0"
-    fastify "4.6.0"
+    fastify "4.7.0"
     light-my-request "5.6.1"
     path-to-regexp "3.2.0"
     tslib "2.4.0"
@@ -2710,7 +2710,7 @@ atomic-sleep@^1.0.0:
   resolved "https://registry.npmjs.org/atomic-sleep/-/atomic-sleep-1.0.0.tgz"
   integrity sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ==
 
-avvio@^8.1.3, avvio@^8.2.0:
+avvio@^8.2.0:
   version "8.2.0"
   resolved "https://registry.npmjs.org/avvio/-/avvio-8.2.0.tgz"
   integrity sha512-bbCQdg7bpEv6kGH41RO/3B2/GMMmJSo2iBK+X8AWN9mujtfUipMDfIjsgHCfpnKqoGEQrrmCDKSa5OQ19+fDmg==
@@ -3865,25 +3865,25 @@ fastify-plugin@^4.0.0, fastify-plugin@^4.2.0:
   resolved "https://registry.npmjs.org/fastify-plugin/-/fastify-plugin-4.2.1.tgz"
   integrity sha512-dlGKiwLzRBKkEf5J5ho0uAD/Jdv8GQVUbriB3tAX3ehRUXE4gTV3lRd5inEg9li1aLzb0EGj8y2K4/8g1TN06g==
 
-fastify@4.6.0:
-  version "4.6.0"
-  resolved "https://registry.npmjs.org/fastify/-/fastify-4.6.0.tgz"
-  integrity sha512-EgWUvcJNvsql1R4g5/ce866BYk8SgJKjGh6AI0e9BR+NidP7hqX1ObiwHEVbkR15A9XwMtkKd3TE/tFZCjsqnA==
+fastify@4.7.0:
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/fastify/-/fastify-4.7.0.tgz#53c0cc16c3850580d22d0bb8e966b263e5c0fcd1"
+  integrity sha512-FK3WT6arZOd2Fm696vIn90DOFr1f8QZbFcvUzYRPJTBV0pzm1xN8Y3n9yegtv1ajAxpdTwuLhB10Wwb/ptMRqQ==
   dependencies:
-    "@fastify/ajv-compiler" "^3.1.1"
+    "@fastify/ajv-compiler" "^3.3.1"
     "@fastify/error" "^3.0.0"
-    "@fastify/fast-json-stringify-compiler" "^4.0.0"
+    "@fastify/fast-json-stringify-compiler" "^4.1.0"
     abstract-logging "^2.0.1"
-    avvio "^8.1.3"
-    find-my-way "^7.0.0"
-    light-my-request "^5.5.1"
-    pino "^8.0.0"
+    avvio "^8.2.0"
+    find-my-way "^7.2.0"
+    light-my-request "^5.6.1"
+    pino "^8.5.0"
     process-warning "^2.0.0"
     proxy-addr "^2.0.7"
     rfdc "^1.3.0"
-    secure-json-parse "^2.4.0"
+    secure-json-parse "^2.5.0"
     semver "^7.3.7"
-    tiny-lru "^8.0.2"
+    tiny-lru "^9.0.2"
 
 fastify@^4.8.1:
   version "4.8.1"
@@ -3948,7 +3948,7 @@ fill-range@^7.0.1:
   dependencies:
     to-regex-range "^5.0.1"
 
-find-my-way@^7.0.0, find-my-way@^7.3.0:
+find-my-way@^7.2.0, find-my-way@^7.3.0:
   version "7.3.1"
   resolved "https://registry.yarnpkg.com/find-my-way/-/find-my-way-7.3.1.tgz#fd8a0b468a18c283e05be59f93a627f37e306cfa"
   integrity sha512-kGvM08SOkqvheLcuQ8GW9t/H901Qb9rZEbcNWbXopzy4jDRoaJpJoObPSKf4MnQLZ20ZTp7rL5MpF6rf+pqmyg==
@@ -5245,7 +5245,7 @@ libphonenumber-js@^1.9.43:
   resolved "https://registry.npmjs.org/libphonenumber-js/-/libphonenumber-js-1.10.13.tgz"
   integrity sha512-b74iyWmwb4GprAUPjPkJ11GTC7KX4Pd3onpJfKxYyY8y9Rbb4ERY47LvCMEDM09WD3thiLDMXtkfDK/AX+zT7Q==
 
-light-my-request@5.6.1, light-my-request@^5.5.1, light-my-request@^5.6.1:
+light-my-request@5.6.1, light-my-request@^5.6.1:
   version "5.6.1"
   resolved "https://registry.npmjs.org/light-my-request/-/light-my-request-5.6.1.tgz"
   integrity sha512-sbJnC1UBRivi9L1kICr3CESb82pNiPNB3TvtdIrZZqW0Qh8uDXvoywMmWKZlihDcmw952CMICCzM+54LDf+E+g==
@@ -6727,7 +6727,7 @@ through@^2.3.6:
   resolved "https://registry.npmjs.org/through/-/through-2.3.8.tgz"
   integrity sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==
 
-tiny-lru@^8.0.1, tiny-lru@^8.0.2:
+tiny-lru@^8.0.1:
   version "8.0.2"
   resolved "https://registry.npmjs.org/tiny-lru/-/tiny-lru-8.0.2.tgz"
   integrity sha512-ApGvZ6vVvTNdsmt676grvCkUCGwzG9IqXma5Z07xJgiC5L7akUMof5U8G2JTI9Rz/ovtVhJBlY6mNhEvtjzOIg==
