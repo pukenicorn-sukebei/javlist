@@ -34,7 +34,7 @@
     "@aws-sdk/s3-request-presigner": "^3.179.0",
     "@fastify/swagger": "^7.6.0",
     "@nestjs/axios": "^0.1.0",
-    "@nestjs/common": "9.1.2",
+    "@nestjs/common": "9.1.4",
     "@nestjs/config": "2.2.0",
     "@nestjs/core": "9.1.2",
     "@nestjs/graphql": "^10.1.2",
