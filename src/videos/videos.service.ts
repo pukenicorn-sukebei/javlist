@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { Prisma, PrismaClient } from '@prisma/client'
 import * as DayJS from 'dayjs'
 
 import { PornScraperService } from '@_clients/porn-scraper.service'
 import { stringifyAliases } from '@_utils/alias'
+import { paginationToPrismaArgs } from '@_utils/infinity-pagination'
 import { IPaginationOptions } from '@_utils/types/pagination-options'
 
 import { FilesService } from '../files/files.service'
@@ -18,8 +19,6 @@ export class VideosService {
     private readonly filesService: FilesService,
     private readonly peopleService: PeopleService,
   ) {}
-
-  static readonly AMOUNT_PER_PAGE = 25
 
   async toDto(video: VideoWithInclude): Promise<VideoDto> {
     const [coverUrl] = await Promise.all([
@@ -64,19 +63,30 @@ export class VideosService {
 
   async findAll(
     codes?: string[],
-    { amount = VideosService.AMOUNT_PER_PAGE, page }: IPaginationOptions = {},
+    pagination: IPaginationOptions = {},
   ): Promise<VideoWithInclude[]> {
+    if (codes?.length) {
+      if (pagination.page !== 1) {
+        throw new BadRequestException(
+          'Can not paginate when `codes` is present',
+        )
+      } else if (codes.length > pagination.amount) {
+        throw new BadRequestException(
+          '`codes` can not be larger than page size',
+        )
+      }
+    }
+
     const videos = await this.prisma.video.findMany({
       include: VideosDefaultInclude,
       where: {
         code: codes ? { in: codes } : undefined,
       },
-      take: amount,
-      skip: (page - 1 || 0) * amount,
+      ...paginationToPrismaArgs(pagination),
       orderBy: { releaseDate: 'desc' },
     })
 
-    if (!codes) {
+    if (!codes?.length) {
       return videos
     }
 
@@ -84,7 +94,7 @@ export class VideosService {
     const newVideos = await Promise.all(
       codes
         .filter((x) => !existingVideoCodes.includes(x))
-        .map(this._fetchVideoFromScraper),
+        .map((code) => this._fetchVideoFromScraper(code)),
     )
 
     return [...videos, ...newVideos]
@@ -92,7 +102,7 @@ export class VideosService {
 
   async findByTags(
     tags: string[],
-    { amount = VideosService.AMOUNT_PER_PAGE, page }: IPaginationOptions = {},
+    pagination: IPaginationOptions = {},
   ): Promise<VideoWithInclude[]> {
     return this.prisma.video.findMany({
       include: VideosDefaultInclude,
@@ -103,8 +113,7 @@ export class VideosService {
           },
         },
       },
-      take: amount,
-      skip: (page - 1 || 0) * amount,
+      ...paginationToPrismaArgs(pagination),
       orderBy: { releaseDate: 'desc' },
     })
   }
