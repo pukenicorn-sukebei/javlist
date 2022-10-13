@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 
+import { ParseExistenceBool } from '@_utils/pipes/parse-existence-bool'
 import { IPaginationOptions } from '@_utils/types/pagination-options'
 
 import { VideoDto } from './videos.dto'
@@ -18,10 +19,10 @@ export class VideosController {
   @Get(':code')
   async getVideo(
     @Param('code') code: string,
-    @Query('force') forceUpdate: string | undefined,
+    @Query('force', ParseExistenceBool) forceUpdate: boolean,
   ): Promise<VideoDto> {
     return this.videosService
-      .findByCode(code, { forceUpdate: forceUpdate !== undefined })
+      .findByCode(code, { forceUpdate })
       .then((video) => this.videosService.toDto(video))
   }
 
