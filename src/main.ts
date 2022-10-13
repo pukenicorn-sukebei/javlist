@@ -40,7 +40,7 @@ async function bootstrap() {
   const swaggerConfig = configService.get<ISwaggerConfig>('swagger')
 
   app.enableShutdownHooks()
-  app.setGlobalPrefix(configService.get('app.apiPrefix'))
+  app.setGlobalPrefix(appConfig.apiPrefix)
   app.enableVersioning({
     type: VersioningType.URI,
   })

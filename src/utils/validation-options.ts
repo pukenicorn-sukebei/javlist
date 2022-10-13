@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common'
 
 const validationOptions: ValidationPipeOptions = {
-  transform: true,
+  transform: false,
   whitelist: true,
   errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
   exceptionFactory: (errors: ValidationError[]) =>
