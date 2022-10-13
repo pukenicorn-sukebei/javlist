@@ -55,22 +55,7 @@ async function bootstrap() {
 void bootstrap()
 
 function getFastifyInstance(): FastifyInstance {
-  const fastify = Fastify()
-
-  // https://hackerone.com/bugs?report_id=1715536&subject=fastify
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const badNames = Object.getOwnPropertyNames({}.__proto__)
-  fastify.addHook('onRequest', async (req, reply) => {
-    for (const badName of badNames) {
-      if (req.headers['content-type'].indexOf(badName) > -1) {
-        void reply.code(415)
-        throw new Error('Content type not supported')
-      }
-    }
-  })
-
-  return fastify
+  return Fastify()
 }
 
 function setupSwagger(
