@@ -40,7 +40,7 @@
     "@nestjs/graphql": "^10.1.2",
     "@nestjs/jwt": "9.0.0",
     "@nestjs/mercurius": "^10.1.2",
-    "@nestjs/platform-fastify": "^9.1.2",
+    "@nestjs/platform-fastify": "^9.1.4",
     "@nestjs/swagger": "6.1.2",
     "@prisma/client": "^4.3.1",
     "bcryptjs": "2.4.3",
