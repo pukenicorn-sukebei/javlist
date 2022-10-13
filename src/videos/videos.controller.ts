@@ -15,11 +15,13 @@ interface VideosParam extends IPaginationOptions {
 export class VideosController {
   constructor(private readonly videosService: VideosService) {}
 
-  // TODO get optional param for force fetching
   @Get(':code')
-  async getVideo(@Param('code') code: string): Promise<VideoDto> {
+  async getVideo(
+    @Param('code') code: string,
+    @Query('force') forceUpdate: string | undefined,
+  ): Promise<VideoDto> {
     return this.videosService
-      .findByCode(code)
+      .findByCode(code, { forceUpdate: forceUpdate !== undefined })
       .then((video) => this.videosService.toDto(video))
   }
 
