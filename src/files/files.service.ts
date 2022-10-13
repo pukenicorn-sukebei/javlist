@@ -17,6 +17,11 @@ import * as UUID from 'uuid'
 import { IS3Config } from '@_config/s3.config'
 import * as UrlUtils from '@_utils/url'
 
+export interface IFileUploadMeta {
+  originalName?: string
+  originalPath?: string
+}
+
 @Injectable()
 export class FilesService {
   private readonly s3Config: IS3Config
@@ -57,7 +62,10 @@ export class FilesService {
       keyPrefix,
       `${UUID.v4()}.${url.split('.').at(-1)}`,
     )
-    return this.upload(bucket, key, data)
+    return this.upload(bucket, key, data, {
+      originalName: url.split('/').pop(),
+      originalPath: url,
+    })
   }
 
   async upload(
@@ -69,6 +77,19 @@ export class FilesService {
     await this.s3Client.send(
       new PutObjectCommand({ Bucket: bucket, Key: key, Body: data }),
     )
+
+    this.prisma.file
+      .create({
+        data: {
+          originalName,
+          originalPath,
+          uploadedBucket: bucket,
+          uploadedPath: key,
+        },
+      })
+      .catch(() => {
+        // TODO log error
+      })
 
     return key
   }
