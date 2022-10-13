@@ -15,29 +15,38 @@ import * as Path from 'path'
 import * as UUID from 'uuid'
 
 import { IS3Config } from '@_config/s3.config'
+import * as UrlUtils from '@_utils/url'
+
+export interface IFileUploadMeta {
+  originalName?: string
+  originalPath?: string
+}
 
 @Injectable()
 export class FilesService {
+  private readonly s3Config: IS3Config
+
   constructor(
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-    private readonly configService: ConfigService,
     private readonly httpService: HttpService,
     private readonly prisma: PrismaClient,
     private readonly s3Client: S3Client,
-  ) {}
+    configService: ConfigService,
+  ) {
+    this.s3Config = configService.get<IS3Config>('s3')
+  }
 
   async uploadAssetFromUrl(url: string): Promise<string> {
-    const config = this.configService.get<IS3Config>('s3')
     return this.uploadFromUrl(
-      config.buckets.asset.name,
-      config.buckets.asset.keyPrefix,
+      this.s3Config.buckets.asset.name,
+      this.s3Config.buckets.asset.keyPrefix,
       url,
     )
   }
+
   async getAssetPreSignedUrl(key: string, age?: number): Promise<string> {
-    const config = this.configService.get<IS3Config>('s3')
-    return this.getPreSignedUrl(config.buckets.asset.name, key, age)
+    return this.getPreSignedUrl(this.s3Config.buckets.asset.name, key, age)
   }
 
   async uploadFromUrl(
@@ -53,18 +62,34 @@ export class FilesService {
       keyPrefix,
       `${UUID.v4()}.${url.split('.').at(-1)}`,
     )
-    return this.upload(bucket, key, data)
+    return this.upload(bucket, key, data, {
+      originalName: url.split('/').pop(),
+      originalPath: url,
+    })
   }
 
   async upload(
     bucket: string,
     key: string,
     data: PutObjectRequest['Body'] | string | Uint8Array | Buffer,
+    { originalName, originalPath }: IFileUploadMeta = {},
   ): Promise<string> {
-    // TODO save entry to db
     await this.s3Client.send(
       new PutObjectCommand({ Bucket: bucket, Key: key, Body: data }),
     )
+
+    this.prisma.file
+      .create({
+        data: {
+          originalName,
+          originalPath,
+          uploadedBucket: bucket,
+          uploadedPath: key,
+        },
+      })
+      .catch(() => {
+        // TODO log error
+      })
 
     return key
   }
@@ -82,14 +107,20 @@ export class FilesService {
       return cacheRes
     }
 
-    // TODO return cdn url from env if set
     const preSignedUrl = await getSignedUrl(
       this.s3Client,
       new GetObjectCommand({ Bucket: bucket, Key: key }),
       {
         expiresIn: age,
       },
-    )
+    ).then((url) => {
+      if (this.s3Config.cdnEndpoint) {
+        try {
+          return UrlUtils.replaceHost(url, this.s3Config.cdnEndpoint)
+        } catch {}
+      }
+      return url
+    })
 
     await this.cacheManager.set(cacheKey, preSignedUrl, { ttl: age * 0.75 })
 

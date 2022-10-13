@@ -68,10 +68,11 @@ model VideoLabel {
 }
 
 model File {
-  id           String   @id @default(uuid())
-  originalName String
-  originalPath String?
-  uploadedPath String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id             String   @id @default(uuid())
+  originalName   String?
+  originalPath   String?
+  uploadedPath   String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  uploadedBucket String
 }

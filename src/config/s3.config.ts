@@ -2,6 +2,7 @@ import { registerAs } from '@nestjs/config'
 
 export interface IS3Config {
   endpoint?: string
+  cdnEndpoint?: string
   region?: string
   buckets: {
     asset: {
@@ -19,6 +20,7 @@ export default registerAs<IS3Config>('s3', () => {
 
   return {
     endpoint: process.env.AWS_S3_ENDPOINT,
+    cdnEndpoint: process.env.AWS_S3_ENDPOINT_CDN,
     region: process.env.AWS_S3_REGION,
     buckets: {
       asset: {
