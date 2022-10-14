@@ -1,5 +1,8 @@
 import { registerAs } from '@nestjs/config'
 
+import { ConfigName } from '@_enum/config'
+import { Env } from '@_enum/env'
+
 export interface IS3Config {
   endpoint?: string
   cdnEndpoint?: string
@@ -13,21 +16,21 @@ export interface IS3Config {
   }
 }
 
-export default registerAs<IS3Config>('s3', () => {
-  if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
+export default registerAs<IS3Config>(ConfigName.S3, () => {
+  if (!process.env[Env.S3.AccessKey] || !process.env[Env.S3.SecretKey]) {
     throw new Error('S3 region is missing')
   }
 
   return {
-    endpoint: process.env.AWS_S3_ENDPOINT,
-    cdnEndpoint: process.env.AWS_S3_ENDPOINT_CDN,
-    region: process.env.AWS_S3_REGION,
+    endpoint: process.env[Env.S3.Endpoint],
+    cdnEndpoint: process.env[Env.S3.EndpointCdn],
+    region: process.env[Env.S3.Region],
     buckets: {
       asset: {
-        name: process.env.AWS_S3_BUCKET_ASSET,
-        keyPrefix: process.env.AWS_S3_BUCKET_ASSET_KEY_PREFIX,
+        name: process.env[Env.S3.Buckets.Asset.Name],
+        keyPrefix: process.env[Env.S3.Buckets.Asset.KeyPrefix],
         presignDuration:
-          +process.env.AWS_S3_BUCKET_ASSET_PRESIGN_DURATION || 60 * 60,
+          +process.env[Env.S3.Buckets.Asset.PresignDuration] || 60 * 60,
       },
     },
   }

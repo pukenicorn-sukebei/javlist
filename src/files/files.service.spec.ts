@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config'
 import * as UUID from 'uuid'
 
 import { IS3Config } from '@_config/s3.config'
+import { ConfigName } from '@_enum/config'
 import { createTestingModule } from '@_utils/testing/module'
 
 import { FilesService } from './files.service'
@@ -21,7 +22,7 @@ describe('FilesService', () => {
     })
 
     const configService = moduleRef.get<ConfigService>(ConfigService)
-    s3Config = configService.get<IS3Config>('s3')
+    s3Config = configService.get<IS3Config>(ConfigName.S3)
 
     service = moduleRef.get<FilesService>(FilesService)
   })
