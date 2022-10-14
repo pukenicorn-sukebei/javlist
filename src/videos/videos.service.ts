@@ -1,14 +1,23 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
-import { Prisma, PrismaClient } from '@prisma/client'
-import * as DayJS from 'dayjs'
+import { InjectQueue } from '@nestjs/bull'
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Optional,
+  RequestTimeoutException,
+} from '@nestjs/common'
+import { PrismaClient } from '@prisma/client'
+import { Queue } from 'bull'
+import { Subscription } from 'rxjs'
 
 import { PornScraperService } from '@_clients/porn-scraper.service'
+import { QueueName } from '@_enum/queue'
 import { stringifyAliases } from '@_utils/alias'
 import { paginationToPrismaArgs } from '@_utils/infinity-pagination'
 import { IPaginationOptions } from '@_utils/types/pagination-options'
 
 import { FilesService } from '../files/files.service'
-import { PeopleService } from '../people/people.service'
+import { PornScraperJobRequest, VideosConsumer } from './videos.consumer'
 import { VideoDto, VideoWithInclude, VideosDefaultInclude } from './videos.dto'
 
 @Injectable()
@@ -17,7 +26,10 @@ export class VideosService {
     private readonly prisma: PrismaClient,
     private readonly pornScraperService: PornScraperService,
     private readonly filesService: FilesService,
-    private readonly peopleService: PeopleService,
+    private readonly videosConsumer: VideosConsumer,
+    @InjectQueue(QueueName.PornScraper)
+    @Optional()
+    private readonly pornScraperQueue?: Queue<PornScraperJobRequest>,
   ) {}
 
   async toDto(video: VideoWithInclude): Promise<VideoDto> {
@@ -58,7 +70,7 @@ export class VideosService {
       return video
     }
 
-    return this._fetchVideoFromScraper(code)
+    return this._fetchFromScraper(code)
   }
 
   async findAll(
@@ -94,7 +106,7 @@ export class VideosService {
     const newVideos = await Promise.all(
       codes
         .filter((x) => !existingVideoCodes.includes(x))
-        .map((code) => this._fetchVideoFromScraper(code)),
+        .map((code) => this._fetchFromScraper(code)),
     )
 
     return [...videos, ...newVideos]
@@ -118,60 +130,50 @@ export class VideosService {
     })
   }
 
-  private async _fetchVideoFromScraper(
-    code: string,
-  ): Promise<VideoWithInclude> {
-    // TODO setup queue for request to limit max simultaneous scrape
-    const scraperResult = await this.pornScraperService.getByCode(code)
-
-    const data = scraperResult.data
-
-    const releaseDate = data.release_date
-      ? DayJS.utc(data.release_date).toDate()
-      : undefined
-
-    const [actors, coverKey] = await Promise.all([
-      this.peopleService.find(data.actresses),
-      this.filesService.uploadAssetFromUrl(data.image),
-    ])
-
-    const params: Prisma.XOR<
-      Prisma.VideoCreateInput,
-      Prisma.VideoUncheckedCreateInput
-    > = {
-      code: data.code.trim(),
-      name: data.name.trim(),
-      releaseDate,
-      coverUrlKey: coverKey,
-      length: 0,
-      label: {
-        connectOrCreate: {
-          create: { name: 'placeholder' },
-          where: { name: 'placeholder' },
-        },
-      },
-      maker: {
-        connectOrCreate: {
-          create: { name: data.studio.trim() },
-          where: { name: data.studio.trim() },
-        },
-      },
-      actors: {
-        connect: actors.map((actor) => ({ id: actor.id })),
-      },
-      tags: {
-        connectOrCreate: data.genres.map((tag) => ({
-          create: { name: tag.trim() },
-          where: { name: tag.trim() },
-        })),
-      },
+  private async _fetchFromScraper(code: string): Promise<VideoWithInclude> {
+    if (this.pornScraperQueue) {
+      return this._fetchFromScraperWithQueue(code)
     }
 
-    return this.prisma.video.upsert({
-      include: VideosDefaultInclude,
-      where: { code: data.code.trim() },
-      create: params,
-      update: params,
+    return this.videosConsumer.fetchVideoFromScraper(code)
+  }
+
+  private async _fetchFromScraperWithQueue(
+    code: string,
+  ): Promise<VideoWithInclude> {
+    let subscription: Subscription
+    const resultPromise = new Promise<VideoWithInclude>((resolve, reject) => {
+      const timerId = setTimeout(
+        () => reject(new RequestTimeoutException()),
+        20000,
+      )
+      subscription = this.videosConsumer.subscribeObservable({
+        next: (result) => {
+          if (result.code === code) {
+            clearTimeout(timerId)
+            if (result.err) {
+              reject(result.err)
+            }
+            if (result.data === null) {
+              reject(new Error('Queue was probably canceled'))
+            }
+            resolve(result.data)
+          }
+        },
+        error: (err) => reject(err),
+        complete: () =>
+          reject(
+            new InternalServerErrorException('something must have went wrong'),
+          ),
+      })
     })
+    resultPromise.finally(() => {
+      subscription?.unsubscribe()
+    })
+
+    // TODO might need to normalize code for job id
+    await this.pornScraperQueue.add({ code }, { jobId: code })
+
+    return resultPromise
   }
 }

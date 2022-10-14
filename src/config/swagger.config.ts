@@ -1,5 +1,8 @@
 import { registerAs } from '@nestjs/config'
 
+import { ConfigName } from '@_enum/config'
+import { Env } from '@_enum/env'
+
 export interface ISwaggerConfig {
   enabled: boolean
   path: string
@@ -8,10 +11,10 @@ export interface ISwaggerConfig {
   version: string
 }
 
-export default registerAs<ISwaggerConfig>('swagger', () => ({
-  enabled: process.env.SWAGGER_ENABLED?.toLowerCase() === 'true',
-  path: process.env.SWAGGER_PATH || 'swagger',
-  title: process.env.SWAGGER_NAME || process.env.APP_NAME || 'title',
-  description: process.env.SWAGGER_DESCRIPTION || 'description',
+export default registerAs<ISwaggerConfig>(ConfigName.Swagger, () => ({
+  enabled: process.env[Env.Swagger.Enabled]?.toLowerCase() === 'true',
+  path: process.env[Env.Swagger.Path] || 'swagger',
+  title: process.env[Env.Swagger.Name] || process.env[Env.App.AppName] || 'title',
+  description: process.env[Env.Swagger.Description] || 'description',
   version: '1.0',
 }))

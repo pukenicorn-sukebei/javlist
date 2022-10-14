@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 
 import { IS3Config } from '@_config/s3.config'
+import { ConfigName } from '@_enum/config'
 
 @Module({
   providers: [
@@ -10,7 +11,7 @@ import { IS3Config } from '@_config/s3.config'
       provide: S3Client,
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const s3Config = configService.get<IS3Config>('s3')
+        const s3Config = configService.get<IS3Config>(ConfigName.S3)
 
         if (!s3Config.region) {
           throw new Error('S3 region is missing')

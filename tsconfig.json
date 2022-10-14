@@ -21,6 +21,7 @@
       "@_config-services/*": ["config-services/*"],
       "@_clients/*": ["clients/*"],
       "@_config/*": ["config/*"],
+      "@_enum/*": ["enum/*"],
       "@_database/*": ["database/*"],
       "@_utils/*": ["utils/*"]
     }

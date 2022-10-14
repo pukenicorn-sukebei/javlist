@@ -5,6 +5,7 @@ import { MercuriusDriverConfig } from '@nestjs/mercurius'
 import { PrismaClient } from '@prisma/client'
 
 import { IAppConfig } from '@_config/app.config'
+import { ConfigName } from '@_enum/config'
 
 import { FilesService } from '../files/files.service'
 import { schema } from '../schema'
@@ -20,18 +21,20 @@ export interface GraphqlContext {
 export class GraphqlConfigService
   implements GqlOptionsFactory<MercuriusDriverConfig>
 {
+  private readonly appConfig: IAppConfig
+
   constructor(
-    private readonly configService: ConfigService,
+    configService: ConfigService,
     private readonly filesService: FilesService,
     private readonly videoService: VideosService,
     private readonly prisma: PrismaClient,
-  ) {}
+  ) {
+    this.appConfig = configService.get<IAppConfig>(ConfigName.App)
+  }
 
   createGqlOptions():
     | Promise<Omit<MercuriusDriverConfig, 'driver'>>
     | Omit<MercuriusDriverConfig, 'driver'> {
-    const appConfig = this.configService.get<IAppConfig>('app')
-
     const context: GraphqlContext = {
       filesService: this.filesService,
       videoService: this.videoService,
@@ -42,8 +45,8 @@ export class GraphqlConfigService
       schema,
       context,
       useGlobalPrefix: true,
-      // debug: appConfig.debug,
-      graphiql: appConfig.debug,
+      // debug: this.appConfig.debug,
+      graphiql: this.appConfig.debug,
     }
   }
 }

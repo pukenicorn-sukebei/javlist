@@ -15,6 +15,7 @@ import * as Path from 'path'
 import * as UUID from 'uuid'
 
 import { IS3Config } from '@_config/s3.config'
+import { ConfigName } from '@_enum/config'
 import * as UrlUtils from '@_utils/url'
 
 export interface IFileUploadMeta {
@@ -34,7 +35,7 @@ export class FilesService {
     private readonly s3Client: S3Client,
     configService: ConfigService,
   ) {
-    this.s3Config = configService.get<IS3Config>('s3')
+    this.s3Config = configService.get<IS3Config>(ConfigName.S3)
   }
 
   async uploadAssetFromUrl(url: string): Promise<string> {

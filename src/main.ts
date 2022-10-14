@@ -18,6 +18,7 @@ import { FastifyInstance } from 'fastify/types/instance'
 
 import { IAppConfig } from '@_config/app.config'
 import { ISwaggerConfig } from '@_config/swagger.config'
+import { ConfigName } from '@_enum/config'
 
 import { AppModule } from './app.module'
 // import { SerializerInterceptor } from './utils/serializer.interceptor'
@@ -36,8 +37,8 @@ async function bootstrap() {
   )
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
   const configService = app.get(ConfigService)
-  const appConfig = configService.get<IAppConfig>('app')
-  const swaggerConfig = configService.get<ISwaggerConfig>('swagger')
+  const appConfig = configService.get<IAppConfig>(ConfigName.App)
+  const swaggerConfig = configService.get<ISwaggerConfig>(ConfigName.Swagger)
 
   app.enableShutdownHooks()
   app.setGlobalPrefix(appConfig.apiPrefix)
