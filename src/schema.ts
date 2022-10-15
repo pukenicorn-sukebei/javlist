@@ -40,7 +40,7 @@ export const schema = makeSchema({
         t.field(Video.length)
         t.string('cover', {
           resolve(video: VideoWithInclude, _, ctx: GraphqlContext) {
-            return ctx.filesService.getAssetPreSignedUrl(video.coverUrlKey)
+            return ctx.filesService.getAssetPreSignedUrl(video.coverPath)
           },
         })
         t.field(Video.label)

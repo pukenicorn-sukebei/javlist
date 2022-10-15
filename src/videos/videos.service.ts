@@ -38,7 +38,7 @@ export class VideosService {
 
   async toDto(video: VideoWithInclude): Promise<VideoDto> {
     const [coverUrl] = await Promise.all([
-      this.filesService.getAssetPreSignedUrl(video.coverUrlKey),
+      this.filesService.getAssetPreSignedUrl(video.coverPath),
     ])
 
     return {
@@ -206,4 +206,6 @@ export class VideosService {
 
     return resultPromise
   }
+
+  // TODO remove file paths without record
 }

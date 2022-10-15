@@ -9,7 +9,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { HttpService } from '@nestjs/axios'
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { PrismaClient } from '@prisma/client'
+import { File, FileType, Prisma, PrismaClient } from '@prisma/client'
 import { Cache } from 'cache-manager'
 import * as Path from 'path'
 import * as UUID from 'uuid'
@@ -43,8 +43,9 @@ export class FilesService {
     this.s3Config = configService.get<IS3Config>(ConfigName.S3)
   }
 
-  async uploadAssetFromUrl(url: string): Promise<string> {
+  async uploadAssetFromUrl(type: FileType, url: string): Promise<File> {
     return this.uploadFromUrl(
+      type,
       this.s3Config.buckets.asset.name,
       this.s3Config.buckets.asset.keyPrefix,
       url,
@@ -56,10 +57,11 @@ export class FilesService {
   }
 
   async uploadFromUrl(
+    type: FileType,
     bucket: string,
     keyPrefix: string,
     url: string,
-  ): Promise<string> {
+  ): Promise<File> {
     const data = await this.httpService.axiosRef
       .get(url, { responseType: 'arraybuffer' })
       .then((response) => Buffer.from(response.data, 'binary'))
@@ -68,43 +70,53 @@ export class FilesService {
       keyPrefix,
       `${UUID.v4()}.${url.split('.').at(-1)}`,
     )
-    return this.upload(bucket, key, data, {
+    return this.upload(type, bucket, key, data, {
       originalName: url.split('/').pop(),
       originalPath: url,
     })
   }
 
   async upload(
+    type: FileType,
     bucket: string,
     key: string,
     data: PutObjectRequest['Body'] | string | Uint8Array | Buffer,
     { originalName, originalPath }: IFileUploadMeta = {},
-  ): Promise<string> {
+  ): Promise<File> {
     this.logger.verbose(`[Upload][${bucket}:${key}] Uploading`)
 
     await this.s3Client
       .send(new PutObjectCommand({ Bucket: bucket, Key: key, Body: data }))
       .then(() => this.logger.debug(`[Upload][${bucket}:${key}] Done`))
-      .catch((err) =>
-        this.logger.error(`[Upload][${bucket}:${key}] Failed: ${err}`),
-      )
-
-    this.prisma.file
-      .create({
-        data: {
-          originalName,
-          originalPath,
-          uploadedBucket: bucket,
-          uploadedPath: key,
-        },
-      })
       .catch((err) => {
-        this.logger.error(
-          `[Upload][${bucket}:${key}] Failed to record to db ${err}`,
-        )
+        this.logger.error(`[Upload][${bucket}:${key}] Failed: ${err}`)
+        throw err
       })
 
-    return key
+    const params: Prisma.XOR<
+      Prisma.FileCreateInput,
+      Prisma.FileUncheckedCreateInput
+    > = {
+      type,
+      originalName,
+      originalPath,
+      uploadedBucket: bucket,
+      uploadedPath: key,
+    }
+
+    const fileRecordPromise = this.prisma.file.upsert({
+      where: { type_uploadedPath: { type, uploadedPath: key } },
+      create: params,
+      update: params,
+    })
+
+    fileRecordPromise.catch((err) =>
+      this.logger.error(
+        `[Upload][${bucket}:${key}] Failed to record to db ${err}`,
+      ),
+    )
+
+    return fileRecordPromise
   }
 
   async getPreSignedUrl(
@@ -149,5 +161,15 @@ export class FilesService {
       .catch((err) =>
         this.logger.error(`[Delete][${bucket}:${key}] Failed: ${err}`),
       )
+
+    await this.prisma.file
+      .delete({ where: { uploadedPath: key } })
+      .catch((err) =>
+        this.logger.error(
+          `[Delete][${bucket}:${key}] Failed to remove from db ${err}`,
+        ),
+      )
   }
+
+  // TODO remove un-binded records
 }
