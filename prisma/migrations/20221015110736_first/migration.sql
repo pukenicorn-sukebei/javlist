@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "FileType" AS ENUM ('VideoCover', 'VideoSample');
+
 -- CreateTable
 CREATE TABLE "Video" (
     "id" TEXT NOT NULL,
@@ -9,7 +12,7 @@ CREATE TABLE "Video" (
     "labelId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "coverUrlKey" TEXT NOT NULL,
+    "coverPath" TEXT NOT NULL,
 
     CONSTRAINT "Video_pkey" PRIMARY KEY ("id")
 );
@@ -63,11 +66,13 @@ CREATE TABLE "VideoLabel" (
 -- CreateTable
 CREATE TABLE "File" (
     "id" TEXT NOT NULL,
-    "originalName" TEXT NOT NULL,
+    "type" "FileType" NOT NULL,
+    "originalName" TEXT,
     "originalPath" TEXT,
     "uploadedPath" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "uploadedBucket" TEXT NOT NULL,
 
     CONSTRAINT "File_pkey" PRIMARY KEY ("id")
 );
@@ -106,6 +111,12 @@ CREATE UNIQUE INDEX "VideoMaker_name_key" ON "VideoMaker"("name");
 CREATE UNIQUE INDEX "VideoLabel_name_key" ON "VideoLabel"("name");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "File_uploadedPath_key" ON "File"("uploadedPath");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "File_type_uploadedPath_key" ON "File"("type", "uploadedPath");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_VideoToVideoTag_AB_unique" ON "_VideoToVideoTag"("A", "B");
 
 -- CreateIndex
@@ -124,10 +135,10 @@ CREATE UNIQUE INDEX "_VideosStarred_AB_unique" ON "_VideosStarred"("A", "B");
 CREATE INDEX "_VideosStarred_B_index" ON "_VideosStarred"("B");
 
 -- AddForeignKey
-ALTER TABLE "Video" ADD CONSTRAINT "Video_makerId_fkey" FOREIGN KEY ("makerId") REFERENCES "VideoMaker"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Video" ADD CONSTRAINT "Video_labelId_fkey" FOREIGN KEY ("labelId") REFERENCES "VideoLabel"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Video" ADD CONSTRAINT "Video_labelId_fkey" FOREIGN KEY ("labelId") REFERENCES "VideoLabel"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Video" ADD CONSTRAINT "Video_makerId_fkey" FOREIGN KEY ("makerId") REFERENCES "VideoMaker"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PersonAlias" ADD CONSTRAINT "PersonAlias_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE CASCADE ON UPDATE CASCADE;

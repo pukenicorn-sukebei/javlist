@@ -15,7 +15,7 @@ import {
   Processor,
 } from '@nestjs/bull'
 import { Injectable } from '@nestjs/common'
-import { Prisma, PrismaClient } from '@prisma/client'
+import { FileType, Prisma, PrismaClient } from '@prisma/client'
 import { Job } from 'bull'
 import * as DayJS from 'dayjs'
 import { Observer, Subject, Subscription, noop } from 'rxjs'
@@ -86,9 +86,12 @@ export class VideosConsumer {
       : undefined
 
     const actorsPromise = this.peopleService.find(data.actresses)
-    const coverKeyPromise = this.filesService.uploadAssetFromUrl(data.image)
+    const coverPromise = this.filesService.uploadAssetFromUrl(
+      FileType.VideoCover,
+      data.image,
+    )
 
-    Promise.resolve([actorsPromise, coverKeyPromise])
+    Promise.resolve([actorsPromise, coverPromise])
       .then((x) => [
         Promise.any(x).then(() => job?.progress(40)),
         Promise.all(x).then(() => job?.progress(60)),
@@ -96,7 +99,7 @@ export class VideosConsumer {
       .catch(noop)
 
     const actors = await actorsPromise
-    const coverKey = await coverKeyPromise
+    const cover = await coverPromise
 
     const params: Prisma.XOR<
       Prisma.VideoCreateInput,
@@ -105,7 +108,7 @@ export class VideosConsumer {
       code: data.code.trim(),
       name: data.name.trim(),
       releaseDate,
-      coverUrlKey: coverKey,
+      coverPath: cover.uploadedPath,
       length: 0,
       label: {
         connectOrCreate: {

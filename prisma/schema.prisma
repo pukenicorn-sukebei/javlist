@@ -21,7 +21,7 @@ model Video {
   labelId     String
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  coverUrlKey String
+  coverPath   String
   label       VideoLabel @relation(fields: [labelId], references: [id])
   maker       VideoMaker @relation(fields: [makerId], references: [id])
   tags        VideoTag[]
@@ -69,10 +69,18 @@ model VideoLabel {
 
 model File {
   id             String   @id @default(uuid())
+  type           FileType
   originalName   String?
   originalPath   String?
-  uploadedPath   String
+  uploadedPath   String   @unique
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   uploadedBucket String
+
+  @@unique([type, uploadedPath])
+}
+
+enum FileType {
+  VideoCover
+  VideoSample
 }
