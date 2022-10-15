@@ -18,16 +18,20 @@ import { IS3Config } from '@_config/s3.config'
 import { ConfigName } from '@_enum/config'
 import * as UrlUtils from '@_utils/url'
 
+import { Logger } from '../logger'
+
 export interface IFileUploadMeta {
   originalName?: string
   originalPath?: string
 }
 
+// TODO support local file hosting?
 @Injectable()
 export class FilesService {
   private readonly s3Config: IS3Config
 
   constructor(
+    private readonly logger: Logger,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     private readonly httpService: HttpService,
@@ -35,6 +39,7 @@ export class FilesService {
     private readonly s3Client: S3Client,
     configService: ConfigService,
   ) {
+    this.logger.setContext(FilesService.name)
     this.s3Config = configService.get<IS3Config>(ConfigName.S3)
   }
 
@@ -75,9 +80,14 @@ export class FilesService {
     data: PutObjectRequest['Body'] | string | Uint8Array | Buffer,
     { originalName, originalPath }: IFileUploadMeta = {},
   ): Promise<string> {
-    await this.s3Client.send(
-      new PutObjectCommand({ Bucket: bucket, Key: key, Body: data }),
-    )
+    this.logger.verbose(`[Upload][${bucket}:${key}] Uploading`)
+
+    await this.s3Client
+      .send(new PutObjectCommand({ Bucket: bucket, Key: key, Body: data }))
+      .then(() => this.logger.debug(`[Upload][${bucket}:${key}] Done`))
+      .catch((err) =>
+        this.logger.error(`[Upload][${bucket}:${key}] Failed: ${err}`),
+      )
 
     this.prisma.file
       .create({
@@ -88,8 +98,10 @@ export class FilesService {
           uploadedPath: key,
         },
       })
-      .catch(() => {
-        // TODO log error
+      .catch((err) => {
+        this.logger.error(
+          `[Upload][${bucket}:${key}] Failed to record to db ${err}`,
+        )
       })
 
     return key
@@ -129,8 +141,13 @@ export class FilesService {
   }
 
   private async _delete(bucket: string, key: string): Promise<void> {
-    await this.s3Client.send(
-      new DeleteObjectCommand({ Bucket: bucket, Key: key }),
-    )
+    this.logger.verbose(`[Delete][${bucket}:${key}] Deleting`)
+
+    await this.s3Client
+      .send(new DeleteObjectCommand({ Bucket: bucket, Key: key }))
+      .then(() => this.logger.debug(`[Delete][${bucket}:${key}] Done`))
+      .catch((err) =>
+        this.logger.error(`[Delete][${bucket}:${key}] Failed: ${err}`),
+      )
   }
 }

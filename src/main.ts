@@ -33,6 +33,7 @@ async function bootstrap() {
     new FastifyAdapter(fastify),
     {
       cors: true,
+      logger: ['log', 'error', 'warn', 'debug', 'verbose'],
     },
   )
   useContainer(app.select(AppModule), { fallbackOnErrors: true })

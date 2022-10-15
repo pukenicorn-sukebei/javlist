@@ -3,7 +3,6 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { GraphQLModule } from '@nestjs/graphql'
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius'
-import { LoggerModule } from 'nestjs-pino'
 
 import { BullConfigService } from '@_config-services/bull-config.service'
 import { GraphqlConfigService } from '@_config-services/graphql-config.service'
@@ -11,6 +10,7 @@ import Configs from '@_config/index'
 import { DatabaseModule } from '@_database/database.module'
 
 import { FilesModule } from './files/files.module'
+import { LoggerModule } from './logger/logger.module'
 import { VideosModule } from './videos/videos.module'
 import { VideosService } from './videos/videos.service'
 
