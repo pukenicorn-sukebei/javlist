@@ -28,6 +28,7 @@ export class VideosModule {
         module: VideosModule,
         global: false,
         ...VideosModule.generateModule({
+          // TODO try get this from config service
           enableScraperQueue: process.env[Env.Feature.CrawlerQueue] === 'true',
         }),
       })
