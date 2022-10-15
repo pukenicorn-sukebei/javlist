@@ -2,6 +2,7 @@
 /dist
 /test
 /generated
+/.dev
 
 **/utils/testing
 *.spec.ts
@@ -10,3 +11,5 @@ Dockerfile
 .gitignore
 docker-compose*.yaml
 README.md
+
+.env.dev
