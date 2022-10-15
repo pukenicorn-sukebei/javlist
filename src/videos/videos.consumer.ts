@@ -24,6 +24,7 @@ import { PornScraperService } from '@_clients/porn-scraper.service'
 import { QueueName } from '@_enum/queue'
 
 import { FilesService } from '../files/files.service'
+import { Logger } from '../logger'
 import { PeopleService } from '../people/people.service'
 import { VideoWithInclude, VideosDefaultInclude } from './videos.dto'
 
@@ -46,11 +47,13 @@ export class VideosConsumer {
   private readonly resultObservableSubj: Subject<PornScraperJobResult>
 
   constructor(
+    private readonly logger: Logger,
     private readonly prisma: PrismaClient,
     private readonly pornScraperService: PornScraperService,
     private readonly filesService: FilesService,
     private readonly peopleService: PeopleService,
   ) {
+    this.logger.setContext(VideosConsumer.name)
     this.resultObservableSubj = new Subject<PornScraperJobResult>()
   }
 
@@ -74,7 +77,7 @@ export class VideosConsumer {
   ): Promise<VideoWithInclude> {
     const scraperResult = await this.pornScraperService.getByCode(code)
 
-    job?.progress(50).catch(noop)
+    job?.progress(20).catch(noop)
 
     const data = scraperResult.data
 
@@ -82,12 +85,18 @@ export class VideosConsumer {
       ? DayJS.utc(data.release_date).toDate()
       : undefined
 
-    const [actors, coverKey] = await Promise.all([
-      this.peopleService.find(data.actresses),
-      this.filesService.uploadAssetFromUrl(data.image),
-    ])
+    const actorsPromise = this.peopleService.find(data.actresses)
+    const coverKeyPromise = this.filesService.uploadAssetFromUrl(data.image)
 
-    job?.progress(75).catch(noop)
+    Promise.resolve([actorsPromise, coverKeyPromise])
+      .then((x) => [
+        Promise.any(x).then(() => job?.progress(40)),
+        Promise.all(x).then(() => job?.progress(60)),
+      ])
+      .catch(noop)
+
+    const actors = await actorsPromise
+    const coverKey = await coverKeyPromise
 
     const params: Prisma.XOR<
       Prisma.VideoCreateInput,
@@ -121,6 +130,8 @@ export class VideosConsumer {
       },
     }
 
+    job?.progress(80).catch(noop)
+
     return this.prisma.video.upsert({
       include: VideosDefaultInclude,
       where: { code: data.code.trim() },
@@ -130,36 +141,35 @@ export class VideosConsumer {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // TODO properly implement logging
 
   @OnQueueError()
   onQueueError(error: Error) {
-    console.info(`queue error: ${error}`)
+    this.logger.error(`[Queue] Error: ${error}`)
   }
 
   @OnQueueWaiting()
   onQueueWaiting(jobId: number | string) {
-    console.info(`job ${jobId} waiting`)
+    this.logger.debug(`[Queue] Job ${jobId} waiting`)
   }
 
   @OnQueueActive()
   onQueueActive(job: PornScraperJob) {
-    console.info(`job ${job.id} active`)
+    this.logger.debug(`[Queue] Job ${job.id} active`)
   }
 
   @OnQueueStalled()
   onQueueStalled(job: PornScraperJob) {
-    console.info(`job ${job.id} stalled`)
+    this.logger.debug(`[Queue] Job ${job.id} stalled`)
   }
 
   @OnQueueProgress()
   onQueueProgress(job: PornScraperJob, progress: number) {
-    console.info(`job ${job.id} progress: ${progress}`)
+    this.logger.verbose(`[Queue] Job ${job.id} progress: ${progress}`)
   }
 
   @OnQueueCompleted()
   onQueueCompleted(job: PornScraperJob, result: VideoWithInclude) {
-    console.info(`job ${job.id} completed`)
+    this.logger.debug(`[Queue] Job ${job.id} completed`)
     this.resultObservableSubj.next({
       code: job.data.code,
       data: result,
@@ -168,7 +178,7 @@ export class VideosConsumer {
 
   @OnQueueFailed()
   onQueueFailed(job: PornScraperJob, err: Error) {
-    console.info(`job ${job.id} failed: ${err}`)
+    this.logger.error(`[Queue] Job ${job.id} failed: ${err}`)
     this.resultObservableSubj.next({
       code: job.data.code,
       err,
@@ -177,20 +187,18 @@ export class VideosConsumer {
 
   @OnQueuePaused()
   onQueuePaused() {
-    console.info('queue paused')
+    this.logger.verbose('[Queue] Paused')
   }
 
   @OnQueueResumed()
   onQueueResumed(job: PornScraperJob) {
-    console.info(`job ${job.id} resumed`)
+    this.logger.debug(`[Queue] Job ${job.id} resumed`)
   }
 
   @OnQueueCleaned()
   onQueueCleaned(jobs: PornScraperJob[], type: string) {
-    console.info(
-      `queue cleaned: ${type} [${jobs
-        .map((job) => `${job.id}`)
-        .join(',')}]`,
+    this.logger.verbose(
+      `[Queue] Cleaned: ${type} [${jobs.map((job) => `${job.id}`).join(',')}]`,
     )
     jobs.forEach((job) => {
       this.resultObservableSubj.next({
@@ -202,12 +210,12 @@ export class VideosConsumer {
 
   @OnQueueDrained()
   onQueueDrained() {
-    console.info('queue drained')
+    this.logger.verbose('[Queue] Drained')
   }
 
   @OnQueueRemoved()
   onQueueRemoved(job: PornScraperJob) {
-    console.info(`job ${job.id} removed`)
+    this.logger.debug(`[Queue] Job ${job.id} removed`)
     this.resultObservableSubj.next({
       code: job.data.code,
       data: null,

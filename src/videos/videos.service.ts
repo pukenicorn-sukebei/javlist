@@ -17,12 +17,14 @@ import { paginationToPrismaArgs } from '@_utils/infinity-pagination'
 import { IPaginationOptions } from '@_utils/types/pagination-options'
 
 import { FilesService } from '../files/files.service'
+import { Logger } from '../logger'
 import { PornScraperJobRequest, VideosConsumer } from './videos.consumer'
 import { VideoDto, VideoWithInclude, VideosDefaultInclude } from './videos.dto'
 
 @Injectable()
 export class VideosService {
   constructor(
+    private readonly logger: Logger,
     private readonly prisma: PrismaClient,
     private readonly pornScraperService: PornScraperService,
     private readonly filesService: FilesService,
@@ -30,7 +32,9 @@ export class VideosService {
     @InjectQueue(QueueName.PornScraper)
     @Optional()
     private readonly pornScraperQueue?: Queue<PornScraperJobRequest>,
-  ) {}
+  ) {
+    logger.setContext(VideosService.name)
+  }
 
   async toDto(video: VideoWithInclude): Promise<VideoDto> {
     const [coverUrl] = await Promise.all([
@@ -70,6 +74,10 @@ export class VideosService {
       return video
     }
 
+    this.logger.verbose(
+      `[findByCode] fetching [${code}]; [forceUpdate]: ${forceUpdate}`,
+    )
+
     return this._fetchFromScraper(code)
   }
 
@@ -99,14 +107,20 @@ export class VideosService {
     })
 
     if (!codes?.length) {
+      this.logger.verbose(`[findAll] no codes specified, skipping fetch`)
+      return videos
+    } else if (codes?.length === videos.length) {
+      this.logger.verbose(`[findAll] got all codes specified, skipping fetch`)
       return videos
     }
 
     const existingVideoCodes = videos.map((v) => v.code)
+    const missingVideoCodes = codes.filter(
+      (x) => !existingVideoCodes.includes(x),
+    )
+    this.logger.debug(`[findAll] fetching [${missingVideoCodes.join(', ')}]`)
     const newVideos = await Promise.all(
-      codes
-        .filter((x) => !existingVideoCodes.includes(x))
-        .map((code) => this._fetchFromScraper(code)),
+      missingVideoCodes.map((code) => this._fetchFromScraper(code)),
     )
 
     return [...videos, ...newVideos]
@@ -132,46 +146,62 @@ export class VideosService {
 
   private async _fetchFromScraper(code: string): Promise<VideoWithInclude> {
     if (this.pornScraperQueue) {
+      this.logger.debug(`[${code}]: fetch with queue`)
       return this._fetchFromScraperWithQueue(code)
+    } else {
+      this.logger.debug(`[${code}]: fetch directly`)
+      return this.videosConsumer.fetchVideoFromScraper(code)
     }
-
-    return this.videosConsumer.fetchVideoFromScraper(code)
   }
 
   private async _fetchFromScraperWithQueue(
     code: string,
   ): Promise<VideoWithInclude> {
+    // TODO might need to normalize code for job id
+
     let subscription: Subscription
     const resultPromise = new Promise<VideoWithInclude>((resolve, reject) => {
-      const timerId = setTimeout(
-        () => reject(new RequestTimeoutException()),
-        20000,
-      )
+      const timerId = setTimeout(() => {
+        this.logger.error(`[${code}][Queue]: Request timed out`)
+        reject(new RequestTimeoutException())
+      }, 20000)
       subscription = this.videosConsumer.subscribeObservable({
         next: (result) => {
           if (result.code === code) {
             clearTimeout(timerId)
             if (result.err) {
+              this.logger.error(
+                `[${code}][Queue]: Resolved to error: ${result.err}`,
+              )
               reject(result.err)
             }
             if (result.data === null) {
+              this.logger.error(`[${code}][Queue]: Probably canceled`)
               reject(new Error('Queue was probably canceled'))
             }
+
+            this.logger.verbose(
+              `[${code}][Queue]: Resolved with ${result.data}`,
+            )
             resolve(result.data)
           }
         },
-        error: (err) => reject(err),
-        complete: () =>
+        error: (err) => {
+          this.logger.error(`[${code}][Queue]: Returned error: ${err}`)
+          reject(err)
+        },
+        complete: () => {
+          this.logger.error(`[${code}][Queue]: Something must have went wrong`)
           reject(
-            new InternalServerErrorException('something must have went wrong'),
-          ),
+            new InternalServerErrorException('Something must have went wrong'),
+          )
+        },
       })
     })
     resultPromise.finally(() => {
       subscription?.unsubscribe()
     })
 
-    // TODO might need to normalize code for job id
     await this.pornScraperQueue.add({ code }, { jobId: code })
 
     return resultPromise
