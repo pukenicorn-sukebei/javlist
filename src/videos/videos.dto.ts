@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma } from '@_clients/prisma'
 
 export const VideosDefaultInclude = {
   label: true,

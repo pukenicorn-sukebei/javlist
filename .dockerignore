@@ -12,4 +12,5 @@ Dockerfile
 docker-compose*.yaml
 README.md
 
+.env
 .env.dev

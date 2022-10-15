@@ -1,9 +1,11 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/clients/prisma"
 }
 
 generator nexusPrisma {
   provider = "nexus-prisma"
+  output   = "../src/clients/nexus-prisma"
 }
 
 datasource db {

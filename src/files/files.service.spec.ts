@@ -6,6 +6,7 @@ import { ConfigName } from '@_enum/config'
 import { createTestingModule } from '@_utils/testing/module'
 
 import { FilesService } from './files.service'
+import { FileType } from '@_clients/prisma'
 
 describe('FilesService', () => {
   const sampleUrl =
@@ -41,11 +42,13 @@ describe('FilesService', () => {
     })
 
     it('should upload file to s3', async () => {
-      key = await service.uploadFromUrl(
+      const result = await service.uploadFromUrl(
+        FileType.VideoCover,
         s3Config.buckets.asset.name,
         s3Config.buckets.asset.keyPrefix,
         sampleUrl,
       )
+      key = result.uploadedPath
 
       const regexp = new RegExp(
         `^${s3Config.buckets.asset.keyPrefix}/([\\w-]+)\\.jpg$`,
@@ -57,11 +60,13 @@ describe('FilesService', () => {
     })
 
     it('should generate pre-signed url', async () => {
-      key = await service.uploadFromUrl(
+      const result = await service.uploadFromUrl(
+        FileType.VideoCover,
         s3Config.buckets.asset.name,
         s3Config.buckets.asset.keyPrefix,
         sampleUrl,
       )
+      key = result.uploadedPath
 
       await expect(
         service.getPreSignedUrl(s3Config.buckets.asset.name, key),

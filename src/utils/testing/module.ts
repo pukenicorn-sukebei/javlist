@@ -4,8 +4,8 @@ import { ConfigModule } from '@nestjs/config'
 import { InstanceToken } from '@nestjs/core/injector/module'
 import { Test, TestingModule } from '@nestjs/testing'
 import { MockFactory } from '@nestjs/testing/interfaces'
-import { PrismaClient } from '@prisma/client'
 
+import { PrismaClient } from '@_clients/prisma'
 import Configs from '@_config/index'
 
 import { S3Module } from '../../s3.module'
@@ -28,6 +28,7 @@ export interface ICreateTestingModule {
     override?: boolean
   }
 }
+
 export interface IMocker {
   earlyMocker?: MockFactory
   lateMocker?: MockFactory
