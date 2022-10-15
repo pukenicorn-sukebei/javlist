@@ -6,13 +6,27 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./.data/db:/var/lib/postgresql/data
+      - ./.dev/pg:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: javlist
 
+  localstack:
+    image: localstack/localstack
+    ports:
+      - '4566:4566'
+    environment:
+      SERVICES: s3
+      DEBUG: 1
+      DATA_DIR: /tmp/localstack/data
+    volumes:
+      - ./.dev/localstack:/tmp/localstack
+      - ./scripts/aws:/docker-entrypoint-initaws.d
+
   redis:
     image: redis:alpine
     ports:
       - '6379:6379'
+    volumes:
+      - ./.dev/redis:/data

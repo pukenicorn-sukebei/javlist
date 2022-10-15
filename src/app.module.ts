@@ -20,7 +20,7 @@ import { VideosService } from './videos/videos.service'
     ConfigModule.forRoot({
       isGlobal: true,
       load: Configs,
-      envFilePath: ['.env', '.env.default'],
+      envFilePath: ['.env', '.env.dev', '.env.default'],
     }),
     BullModule.forRootAsync({
       useClass: BullConfigService,
