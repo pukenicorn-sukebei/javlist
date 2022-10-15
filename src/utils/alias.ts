@@ -1,4 +1,4 @@
-import { PersonAlias } from '@prisma/client'
+import { PersonAlias } from '@_clients/prisma'
 
 export function stringifyAliases(aliases: (PersonAlias | string)[]) {
   const _aliases = aliases.map((alias) =>

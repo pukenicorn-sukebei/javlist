@@ -15,16 +15,16 @@ import {
   Processor,
 } from '@nestjs/bull'
 import { Injectable } from '@nestjs/common'
-import { FileType, Prisma, PrismaClient } from '@prisma/client'
 import { Job } from 'bull'
 import * as DayJS from 'dayjs'
 import { Observer, Subject, Subscription, noop } from 'rxjs'
 
 import { PornScraperService } from '@_clients/porn-scraper.service'
+import { FileType, Prisma, PrismaClient } from '@_clients/prisma'
 import { QueueName } from '@_enum/queue'
+import { Logger } from '@_logger'
 
 import { FilesService } from '../files/files.service'
-import { Logger } from '../logger'
 import { PeopleService } from '../people/people.service'
 import { VideoWithInclude, VideosDefaultInclude } from './videos.dto'
 

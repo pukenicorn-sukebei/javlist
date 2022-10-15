@@ -1,6 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common'
 
-import { Logger } from './logger'
+import { Logger } from '@_logger'
 
 @Module({
   providers: [Logger],

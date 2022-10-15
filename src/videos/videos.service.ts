@@ -6,18 +6,18 @@ import {
   Optional,
   RequestTimeoutException,
 } from '@nestjs/common'
-import { PrismaClient } from '@prisma/client'
 import { Queue } from 'bull'
 import { Subscription } from 'rxjs'
 
 import { PornScraperService } from '@_clients/porn-scraper.service'
+import { PrismaClient } from '@_clients/prisma'
 import { QueueName } from '@_enum/queue'
+import { Logger } from '@_logger'
 import { stringifyAliases } from '@_utils/alias'
 import { paginationToPrismaArgs } from '@_utils/infinity-pagination'
 import { IPaginationOptions } from '@_utils/types/pagination-options'
 
 import { FilesService } from '../files/files.service'
-import { Logger } from '../logger'
 import { PornScraperJobRequest, VideosConsumer } from './videos.consumer'
 import { VideoDto, VideoWithInclude, VideosDefaultInclude } from './videos.dto'
 

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
-import { PrismaClient } from '@prisma/client'
+
+import { PrismaClient } from '@_clients/prisma'
 
 @Module({
   providers: [

@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { GqlOptionsFactory } from '@nestjs/graphql'
 import { MercuriusDriverConfig } from '@nestjs/mercurius'
-import { PrismaClient } from '@prisma/client'
 
+import { PrismaClient } from '@_clients/prisma'
 import { IAppConfig } from '@_config/app.config'
 import { ConfigName } from '@_enum/config'
 

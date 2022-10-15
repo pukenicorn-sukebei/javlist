@@ -9,16 +9,15 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { HttpService } from '@nestjs/axios'
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { File, FileType, Prisma, PrismaClient } from '@prisma/client'
 import { Cache } from 'cache-manager'
 import * as Path from 'path'
 import * as UUID from 'uuid'
 
+import { File, FileType, Prisma, PrismaClient } from '@_clients/prisma'
 import { IS3Config } from '@_config/s3.config'
 import { ConfigName } from '@_enum/config'
+import { Logger } from '@_logger'
 import * as UrlUtils from '@_utils/url'
-
-import { Logger } from '../logger'
 
 export interface IFileUploadMeta {
   originalName?: string
