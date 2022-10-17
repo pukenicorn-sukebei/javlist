@@ -20,8 +20,8 @@ import * as DayJS from 'dayjs'
 import { Observer, Subject, Subscription, noop } from 'rxjs'
 
 import { PornScraperService } from '@_clients/porn-scraper.service'
-import { FileType, Prisma, PrismaClient } from '@_clients/prisma'
 import { QueueName } from '@_enum/queue'
+import { FileType, Prisma, PrismaClient } from '@_generated/prisma'
 import { Logger } from '@_logger'
 
 import { FilesService } from '../files/files.service'

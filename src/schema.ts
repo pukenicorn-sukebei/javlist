@@ -10,6 +10,7 @@ import {
 import NexusPrismaScalars from 'nexus-prisma/scalars'
 import * as Path from 'path'
 
+import { GraphqlContext } from '@_config-services/graphql-config.service'
 import {
   Person,
   PersonAlias,
@@ -17,8 +18,7 @@ import {
   VideoLabel,
   VideoMaker,
   VideoTag,
-} from '@_clients/nexus-prisma'
-import { GraphqlContext } from '@_config-services/graphql-config.service'
+} from '@_generated/nexus-prisma'
 
 import { VideoWithInclude } from './videos/videos.dto'
 

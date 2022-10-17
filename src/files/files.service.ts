@@ -13,9 +13,9 @@ import { Cache } from 'cache-manager'
 import * as Path from 'path'
 import * as UUID from 'uuid'
 
-import { File, FileType, Prisma, PrismaClient } from '@_clients/prisma'
 import { IS3Config } from '@_config/s3.config'
 import { ConfigName } from '@_enum/config'
+import { File, FileType, Prisma, PrismaClient } from '@_generated/prisma'
 import { Logger } from '@_logger'
 import * as UrlUtils from '@_utils/url'
 

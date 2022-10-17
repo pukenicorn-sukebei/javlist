@@ -255,3 +255,5 @@ Temporary Items
 .apdisk
 
 /.dev
+/src/clients/**/*
+/generated
