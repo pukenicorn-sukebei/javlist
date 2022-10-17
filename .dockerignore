@@ -14,5 +14,3 @@ README.md
 
 .env
 .env.dev
-
-/src/clients/**/*

@@ -18,7 +18,7 @@
     "migration:run": "dotenv prisma migrate deploy",
     "generate": "dotenv yarn prisma generate && yarn generate:client",
     "generate:client": "dotenv yarn generate:porn-scraper-client",
-    "generate:porn-scraper-client": "openapi-generator-cli generate -g typescript-nestjs --additional-properties=serviceSuffix=ScraperService,supportsES6=true -i https://p.pukenicorn.com/scraper/openapi.json -o src/clients/porn-scraper",
+    "generate:porn-scraper-client": "openapi-generator-cli generate -g typescript-nestjs --additional-properties=serviceSuffix=ScraperService,supportsES6=true -i https://p.pukenicorn.com/scraper/openapi.json -o generated/porn-scraper-client",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
