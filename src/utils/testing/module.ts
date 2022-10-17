@@ -5,8 +5,8 @@ import { InstanceToken } from '@nestjs/core/injector/module'
 import { Test, TestingModule } from '@nestjs/testing'
 import { MockFactory } from '@nestjs/testing/interfaces'
 
-import { PrismaClient } from '@_clients/prisma'
 import Configs from '@_config/index'
+import { PrismaClient } from '@_generated/prisma'
 
 import { S3Module } from '../../s3.module'
 
@@ -37,7 +37,7 @@ export interface IMocker {
 function defaultMocker(token: InstanceToken) {
   switch (token) {
     case PrismaClient:
-      jest.mock('@prisma/client')
+      jest.mock('@_generated/prisma')
       return new PrismaClient()
   }
 }

@@ -35,6 +35,7 @@ FROM base as output
 
 COPY .env.default .
 COPY --from=dependencies /app/prod_modules /app/node_modules
+COPY --from=builder /app/generated /app/generated
 COPY --from=builder /app/dist /app/dist
 
 ENTRYPOINT ["yarn"]

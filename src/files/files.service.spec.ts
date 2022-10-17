@@ -3,10 +3,10 @@ import * as UUID from 'uuid'
 
 import { IS3Config } from '@_config/s3.config'
 import { ConfigName } from '@_enum/config'
+import { FileType } from '@_generated/prisma'
 import { createTestingModule } from '@_utils/testing/module'
 
 import { FilesService } from './files.service'
-import { FileType } from '@_clients/prisma'
 
 describe('FilesService', () => {
   const sampleUrl =

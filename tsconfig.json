@@ -23,8 +23,12 @@
       "@_config/*": ["config/*"],
       "@_enum/*": ["enum/*"],
       "@_database/*": ["database/*"],
+      "@_generated/*": ["../generated/*"],
       "@_logger": ["logger"],
       "@_utils/*": ["utils/*"]
     }
-  }
+  },
+  "include": [
+    "src"
+  ]
 }
