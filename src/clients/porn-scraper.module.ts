@@ -2,9 +2,13 @@ import { HttpModule } from '@nestjs/axios'
 import { Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 
-import { Configuration, JavScraperService } from '@_clients/porn-scraper'
-import { PornScraperService } from '@_clients/porn-scraper.service'
 import { ConfigName } from '@_enum/config'
+import {
+  Configuration,
+  JavScraperService,
+} from '@_generated/porn-scraper-client'
+
+import { PornScraperService } from './porn-scraper.service'
 
 @Module({
   imports: [HttpModule],

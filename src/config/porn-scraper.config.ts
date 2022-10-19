@@ -1,6 +1,6 @@
+import { Configuration } from '@_generated/porn-scraper-client'
 import { registerAs } from '@nestjs/config'
 
-import { Configuration } from '@_clients/porn-scraper'
 import { ConfigName } from '@_enum/config'
 import { Env } from '@_enum/env'
 
