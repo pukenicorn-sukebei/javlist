@@ -13,7 +13,7 @@ import { Cache } from 'cache-manager'
 import * as Path from 'path'
 import * as UUID from 'uuid'
 
-import { IS3Config } from '@_config/s3.config'
+import { S3Config } from '@_config/s3.config'
 import { ConfigName } from '@_enum/config'
 import { File, FileType, Prisma, PrismaClient } from '@_generated/prisma'
 import { Logger } from '@_logger'
@@ -27,7 +27,7 @@ export interface IFileUploadMeta {
 // TODO support local file hosting?
 @Injectable()
 export class FilesService {
-  private readonly s3Config: IS3Config
+  private readonly s3Config: S3Config
 
   constructor(
     private readonly logger: Logger,
@@ -39,7 +39,7 @@ export class FilesService {
     configService: ConfigService,
   ) {
     this.logger.setContext(FilesService.name)
-    this.s3Config = configService.get<IS3Config>(ConfigName.S3)
+    this.s3Config = configService.get<S3Config>(ConfigName.S3)
   }
 
   async uploadAssetFromUrl(type: FileType, url: string): Promise<File> {

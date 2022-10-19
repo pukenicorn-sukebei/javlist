@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config'
 import * as UUID from 'uuid'
 
-import { IS3Config } from '@_config/s3.config'
+import { S3Config } from '@_config/s3.config'
 import { ConfigName } from '@_enum/config'
 import { FileType } from '@_generated/prisma'
 import { createTestingModule } from '@_utils/testing/module'
@@ -12,7 +12,7 @@ describe('FilesService', () => {
   const sampleUrl =
     'https://pics.dmm.co.jp/mono/movie/adult/ssis527/ssis527pl.jpg'
 
-  let s3Config: IS3Config
+  let s3Config: S3Config
   let service: FilesService
 
   beforeEach(async () => {
@@ -23,7 +23,7 @@ describe('FilesService', () => {
     })
 
     const configService = moduleRef.get<ConfigService>(ConfigService)
-    s3Config = configService.get<IS3Config>(ConfigName.S3)
+    s3Config = configService.get<S3Config>(ConfigName.S3)
 
     service = moduleRef.get<FilesService>(FilesService)
   })

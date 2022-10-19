@@ -16,8 +16,8 @@ import * as DayJS_UTC from 'dayjs/plugin/utc'
 import Fastify from 'fastify'
 import { FastifyInstance } from 'fastify/types/instance'
 
-import { IAppConfig } from '@_config/app.config'
-import { ISwaggerConfig } from '@_config/swagger.config'
+import { AppConfig } from '@_config/app.config'
+import { SwaggerConfig } from '@_config/swagger.config'
 import { ConfigName } from '@_enum/config'
 
 import { AppModule } from './app.module'
@@ -38,8 +38,8 @@ async function bootstrap() {
   )
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
   const configService = app.get(ConfigService)
-  const appConfig = configService.get<IAppConfig>(ConfigName.App)
-  const swaggerConfig = configService.get<ISwaggerConfig>(ConfigName.Swagger)
+  const appConfig = configService.get<AppConfig>(ConfigName.App)
+  const swaggerConfig = configService.get<SwaggerConfig>(ConfigName.Swagger)
 
   app.enableShutdownHooks()
   app.setGlobalPrefix(appConfig.apiPrefix)
@@ -62,7 +62,7 @@ function getFastifyInstance(): FastifyInstance {
 
 function setupSwagger(
   app: INestApplication,
-  swaggerConfig: ISwaggerConfig,
+  swaggerConfig: SwaggerConfig,
 ): void {
   if (swaggerConfig.enabled) {
     const options = new DocumentBuilder()
