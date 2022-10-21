@@ -2,6 +2,7 @@ import { registerAs } from '@nestjs/config'
 
 import { ConfigName } from '@_enum/config'
 import { Env } from '@_enum/env'
+import { LogLevel, parseLogLevel } from '@_enum/log-level'
 
 export class AppConfig {
   constructor(data: Partial<AppConfig>) {
@@ -13,6 +14,7 @@ export class AppConfig {
   name?: string
   port: number
   apiPrefix: string
+  logLevel: LogLevel
 }
 
 export default registerAs<AppConfig>(
@@ -28,5 +30,6 @@ export default registerAs<AppConfig>(
           10,
         ) || 3000,
       apiPrefix: process.env[Env.App.ApiPrefix],
+      logLevel: parseLogLevel(process.env[Env.App.LogLevel]),
     }),
 )

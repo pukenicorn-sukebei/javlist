@@ -19,6 +19,7 @@ import { FastifyInstance } from 'fastify/types/instance'
 import { AppConfig } from '@_config/app.config'
 import { SwaggerConfig } from '@_config/swagger.config'
 import { ConfigName } from '@_enum/config'
+import { LogLevel } from '@_enum/log-level'
 
 import { AppModule } from './app.module'
 // import { SerializerInterceptor } from './utils/serializer.interceptor'
@@ -33,7 +34,7 @@ async function bootstrap() {
     new FastifyAdapter(fastify),
     {
       cors: true,
-      logger: ['log', 'error', 'warn', 'debug', 'verbose'],
+      bufferLogs: true,
     },
   )
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
@@ -42,6 +43,7 @@ async function bootstrap() {
   const swaggerConfig = configService.get<SwaggerConfig>(ConfigName.Swagger)
 
   app.enableShutdownHooks()
+  app.useLogger(getLoggerLogLevel(appConfig))
   app.setGlobalPrefix(appConfig.apiPrefix)
   app.enableVersioning({
     type: VersioningType.URI,
@@ -58,6 +60,24 @@ void bootstrap()
 
 function getFastifyInstance(): FastifyInstance {
   return Fastify()
+}
+
+function getLoggerLogLevel(appConfig: AppConfig) {
+  const logLevels = []
+  // noinspection FallThroughInSwitchStatementJS
+  switch (appConfig.logLevel) {
+    case LogLevel.Verbose:
+      logLevels.push(LogLevel.Verbose)
+    case LogLevel.Debug:
+      logLevels.push(LogLevel.Debug)
+    case LogLevel.Log:
+      logLevels.push(LogLevel.Log)
+    case LogLevel.Warn:
+      logLevels.push(LogLevel.Warn)
+    case LogLevel.Error:
+      logLevels.push(LogLevel.Error)
+  }
+  return logLevels
 }
 
 function setupSwagger(
