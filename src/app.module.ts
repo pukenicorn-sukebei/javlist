@@ -17,16 +17,10 @@ import { LoggerModule } from './logger/logger.module'
 import { VideosModule } from './videos/videos.module'
 import { VideosService } from './videos/videos.service'
 
-class Config extends ConfigModule implements OnModuleInit {
-  onModuleInit(): any {
-    console.log('FUCK', this)
-  }
-}
-
 @Module({
   imports: [
     LoggerModule.forRoot(),
-    Config.forRoot({
+    ConfigModule.forRoot({
       isGlobal: true,
       load: Configs,
       envFilePath: ['.env', '.env.dev', '.env.default'],
