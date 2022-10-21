@@ -169,21 +169,24 @@ export class VideosService {
         next: (result) => {
           if (result.code === code) {
             clearTimeout(timerId)
-            if (result.err) {
+            if (result.data) {
+              this.logger.verbose(
+                `[${code}][Queue]: Resolved with ${result.data}`,
+              )
+              resolve(result.data)
+            } else if (result.err) {
               this.logger.error(
                 `[${code}][Queue]: Resolved to error: ${result.err}`,
               )
               reject(result.err)
-            }
-            if (result.data === null) {
-              this.logger.error(`[${code}][Queue]: Probably canceled`)
+            } else {
+              this.logger.error(
+                `[${code}][Queue]: Probably canceled; ${JSON.stringify(
+                  result,
+                )}`,
+              )
               reject(new Error('Queue was probably canceled'))
             }
-
-            this.logger.verbose(
-              `[${code}][Queue]: Resolved with ${result.data}`,
-            )
-            resolve(result.data)
           }
         },
         error: (err) => {

@@ -7,7 +7,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "target": "es2018",
-    "sourceMap": false,
+    "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./src",
     "incremental": true,
@@ -27,5 +27,8 @@
       "@_logger": ["logger"],
       "@_utils/*": ["utils/*"]
     }
-  }
+  },
+  "include": [
+    "./src"
+  ]
 }

@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { GqlOptionsFactory } from '@nestjs/graphql'
 import { MercuriusDriverConfig } from '@nestjs/mercurius'
 
-import { IAppConfig } from '@_config/app.config'
+import { AppConfig } from '@_config/app.config'
 import { ConfigName } from '@_enum/config'
 import { PrismaClient } from '@_generated/prisma'
 
@@ -21,7 +21,7 @@ export interface GraphqlContext {
 export class GraphqlConfigService
   implements GqlOptionsFactory<MercuriusDriverConfig>
 {
-  private readonly appConfig: IAppConfig
+  private readonly appConfig: AppConfig
 
   constructor(
     configService: ConfigService,
@@ -29,7 +29,7 @@ export class GraphqlConfigService
     private readonly videoService: VideosService,
     private readonly prisma: PrismaClient,
   ) {
-    this.appConfig = configService.get<IAppConfig>(ConfigName.App)
+    this.appConfig = configService.get<AppConfig>(ConfigName.App)
   }
 
   createGqlOptions():

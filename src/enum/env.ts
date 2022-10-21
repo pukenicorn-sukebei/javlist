@@ -4,6 +4,7 @@ enum App {
   Port = 'PORT',
   AppPort = 'APP_PORT',
   ApiPrefix = 'API_PREFIX',
+  LogLevel = 'APP_LOG_LEVEL',
 }
 
 enum Feature {
