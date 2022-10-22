@@ -17,6 +17,7 @@
     "migration:reset": "dotenv prisma migrate reset",
     "migration:run": "dotenv prisma migrate deploy",
     "generate": "dotenv yarn prisma generate",
+    "generate:swagger": "ts-node --project tsconfig.tsc.json ./src/generate-openapi.ts",
     "generate:ts-post": "tsc -p tsconfig.generated.json && rimraf generated-ts",
     "prebuild": "rimraf dist",
     "build": "nest build",
