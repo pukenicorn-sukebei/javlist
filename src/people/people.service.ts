@@ -2,19 +2,33 @@ import { Injectable } from '@nestjs/common'
 
 import { Person, PrismaClient } from '@_generated/prisma'
 
+import { PeopleDefaultInclude, PersonWithInclude } from './people.dto'
+
 @Injectable()
 export class PeopleService {
   constructor(private readonly prisma: PrismaClient) {}
 
-  static readonly INCLUDES = {
-    aliases: true,
+  private normalizeAlias(alias: string) {
+    return alias.replace('/[-_]/g', ' ')
   }
 
-  async find(aliases: string[]): Promise<Person[]> {
+  async findByAlias(alias: string): Promise<PersonWithInclude> {
+    const normalizedAlias = this.normalizeAlias(alias)
+    return this.prisma.person.findFirst({
+      include: PeopleDefaultInclude,
+      where: {
+        aliases: {
+          some: { alias: { equals: normalizedAlias, mode: 'insensitive' } },
+        },
+      },
+    })
+  }
+
+  async upsertWithAliases(aliases: string[]): Promise<Person[]> {
     aliases = aliases.map((x) => x.trim())
 
     const people = await this.prisma.person.findMany({
-      include: PeopleService.INCLUDES,
+      include: { aliases: true },
       where: {
         aliases: {
           some: {
@@ -32,7 +46,7 @@ export class PeopleService {
         .filter((x) => !existingPeopleAliases.includes(x))
         .map((alias) =>
           this.prisma.person.create({
-            include: PeopleService.INCLUDES,
+            include: { aliases: true },
             data: {
               aliases: {
                 connectOrCreate: {

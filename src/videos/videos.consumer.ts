@@ -85,7 +85,7 @@ export class VideosConsumer {
       ? DayJS.utc(data.release_date).toDate()
       : undefined
 
-    const actorsPromise = this.peopleService.find(data.actresses)
+    const actorsPromise = this.peopleService.upsertWithAliases(data.actresses)
     const coverPromise = this.filesService.uploadAssetFromUrl(
       FileType.VideoCover,
       data.image,

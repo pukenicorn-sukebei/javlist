@@ -1,5 +1,7 @@
 import { Prisma } from '@_generated/prisma'
 
+import SortOrder = Prisma.SortOrder
+
 export const VideosDefaultInclude = {
   label: true,
   maker: true,
@@ -11,6 +13,10 @@ export const VideosDefaultInclude = {
   },
   tags: true,
 }
+export const VideosRelationInclude = {
+  orderBy: [{ releaseDate: SortOrder.desc }],
+}
+
 export type VideoWithInclude<
   IC = {
     include: typeof VideosDefaultInclude

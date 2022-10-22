@@ -1,4 +1,12 @@
-import { Controller, Get, Param, ParseArrayPipe, Query } from '@nestjs/common'
+import {
+  ClassSerializerInterceptor,
+  Controller,
+  Get,
+  Param,
+  ParseArrayPipe,
+  Query,
+  UseInterceptors,
+} from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 
 import { PaginationDto, PaginationQuery } from '@_utils/dto/pagination.dto'
@@ -10,6 +18,7 @@ import { VideosService } from './videos.service'
 
 @ApiTags('videos')
 @Controller('videos')
+@UseInterceptors(ClassSerializerInterceptor)
 export class VideosController {
   constructor(private readonly videosService: VideosService) {}
 
