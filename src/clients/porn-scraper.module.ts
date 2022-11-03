@@ -1,12 +1,10 @@
 import { HttpModule } from '@nestjs/axios'
 import { Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { JavApi, JavApiFactory } from '@pukenicorn-sukebei/porn-scraper-client'
 
+import { PornScraperConfig } from '@_config/porn-scraper.config'
 import { ConfigName } from '@_enum/config'
-import {
-  Configuration,
-  JavScraperService,
-} from '@_generated/porn-scraper-client'
 
 import { PornScraperService } from './porn-scraper.service'
 
@@ -14,12 +12,15 @@ import { PornScraperService } from './porn-scraper.service'
   imports: [HttpModule],
   providers: [
     {
-      provide: Configuration,
+      provide: JavApi,
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) =>
-        configService.get<Configuration>(ConfigName.PornScraper),
+      useFactory: (configService: ConfigService) => {
+        const config = configService.get<PornScraperConfig>(
+          ConfigName.PornScraper,
+        )
+        return JavApiFactory(null, config.basePath)
+      },
     },
-    JavScraperService,
     PornScraperService,
   ],
   exports: [PornScraperService],

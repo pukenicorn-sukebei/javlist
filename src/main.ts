@@ -20,6 +20,7 @@ import { AppConfig } from '@_config/app.config'
 import { SwaggerConfig } from '@_config/swagger.config'
 import { ConfigName } from '@_enum/config'
 import { LogLevel } from '@_enum/log-level'
+import { Logger } from '@_logger'
 
 import { AppModule } from './app.module'
 // import { SerializerInterceptor } from './utils/serializer.interceptor'
