@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dotenv": "dotenv -e .env -e .env.dev -e .env.default --",
-    "postinstall": "test $SKIP_POSTINSTALL || is-ci || husky install",
+    "postinstall": "test $SKIP_POSTINSTALL || (is-ci && yarn generate || husky install)",
     "prisma:generate": "dotenv prisma generate",
     "migration:create": "dotenv prisma migrate dev && dotenv yarn run migration:pull",
     "migration:pull": "dotenv prisma db pull",
