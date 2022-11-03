@@ -11,7 +11,7 @@ enum Feature {
   CrawlerQueue = 'ENABLE_CRAWLER_QUEUE',
 }
 
-enum PornCrawler {
+enum PornScraper {
   BasePath = 'PORN_SCRAPER_BASEPATH',
 }
 
@@ -45,7 +45,7 @@ enum Swagger {
 export class Env {
   static readonly App = App
   static readonly Feature = Feature
-  static readonly PornCrawler = PornCrawler
+  static readonly PornScraper = PornScraper
   static readonly Redis = Redis
   static readonly S3 = S3
   static readonly Swagger = Swagger
