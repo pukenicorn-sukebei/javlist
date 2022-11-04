@@ -35,8 +35,9 @@ export default registerAs<S3Config>(
         asset: {
           name: process.env[Env.S3.Buckets.Asset.Name],
           keyPrefix: process.env[Env.S3.Buckets.Asset.KeyPrefix],
-          presignDuration:
-            +process.env[Env.S3.Buckets.Asset.PresignDuration] || 60 * 60,
+          presignDuration: +(
+            process.env[Env.S3.Buckets.Asset.PresignDuration] || 60 * 60
+          ),
         },
       },
     }),

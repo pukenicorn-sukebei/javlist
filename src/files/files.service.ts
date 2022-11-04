@@ -7,7 +7,12 @@ import {
 import { PutObjectRequest } from '@aws-sdk/client-s3/dist-types/models/models_0'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { HttpService } from '@nestjs/axios'
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common'
+import {
+  CACHE_MANAGER,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Cache } from 'cache-manager'
 import * as Path from 'path'
@@ -39,20 +44,29 @@ export class FilesService {
     configService: ConfigService,
   ) {
     this.logger.setContext(FilesService.name)
-    this.s3Config = configService.get<S3Config>(ConfigName.S3)
+    this.s3Config = configService.get<S3Config>(ConfigName.S3)!
+
+    if (
+      !this.s3Config.buckets.asset.name ||
+      !this.s3Config.buckets.asset.keyPrefix
+    ) {
+      throw new InternalServerErrorException(
+        'S3 Asset bucket name or key prefix is missing',
+      )
+    }
   }
 
   async uploadAssetFromUrl(type: FileType, url: string): Promise<File> {
     return this.uploadFromUrl(
       type,
-      this.s3Config.buckets.asset.name,
-      this.s3Config.buckets.asset.keyPrefix,
+      this.s3Config.buckets.asset.name!,
+      this.s3Config.buckets.asset.keyPrefix!,
       url,
     )
   }
 
   async getAssetPreSignedUrl(key: string, age?: number): Promise<string> {
-    return this.getPreSignedUrl(this.s3Config.buckets.asset.name, key, age)
+    return this.getPreSignedUrl(this.s3Config.buckets.asset.name!, key, age)
   }
 
   async uploadFromUrl(
@@ -121,7 +135,7 @@ export class FilesService {
   async getPreSignedUrl(
     bucket: string,
     key: string,
-    age?: number,
+    age: number = 60 * 60,
   ): Promise<string> {
     const cacheKey = `FILES->${bucket}->${key}`
 
@@ -132,6 +146,8 @@ export class FilesService {
     }
 
     const preSignedUrl = await getSignedUrl(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       this.s3Client,
       new GetObjectCommand({ Bucket: bucket, Key: key }),
       {

@@ -17,8 +17,8 @@ import { PornScraperService } from './porn-scraper.service'
       useFactory: (configService: ConfigService) => {
         const config = configService.get<PornScraperConfig>(
           ConfigName.PornScraper,
-        )
-        return JavApiFactory(null, config.basePath)
+        )!
+        return JavApiFactory(undefined, config.basePath)
       },
     },
     PornScraperService,

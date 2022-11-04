@@ -17,6 +17,6 @@ export default registerAs<RedisConfig>(
   () =>
     new RedisConfig({
       host: process.env[Env.Redis.Host],
-      port: +process.env[Env.Redis.Port] || 6379,
+      port: +(process.env[Env.Redis.Port] || 6379),
     }),
 )

@@ -1,12 +1,11 @@
 import { HttpModule } from '@nestjs/axios'
 import { ModuleMetadata } from '@nestjs/common/interfaces/modules/module-metadata.interface'
 import { ConfigModule } from '@nestjs/config'
-import { InstanceToken } from '@nestjs/core/injector/module'
 import { Test, TestingModule } from '@nestjs/testing'
 import { MockFactory } from '@nestjs/testing/interfaces'
 
 import Configs from '@_config/index'
-import { PrismaClient } from '@_generated/prisma'
+import { mockFactory } from '@_utils/testing/class-mocker'
 
 import { S3Module } from '../../s3.module'
 
@@ -32,14 +31,6 @@ export interface ICreateTestingModule {
 export interface IMocker {
   earlyMocker?: MockFactory
   lateMocker?: MockFactory
-}
-
-function defaultMocker(token: InstanceToken) {
-  switch (token) {
-    case PrismaClient:
-      jest.mock('@_generated/prisma')
-      return new PrismaClient()
-  }
 }
 
 export async function createTestingModule(
@@ -76,7 +67,7 @@ export async function createTestingModule(
   })
     .useMocker(
       (token) =>
-        earlyMocker?.(token) || defaultMocker(token) || lateMocker?.(token),
+        earlyMocker?.(token) || mockFactory(token) || lateMocker?.(token),
     )
     .compile()
 }

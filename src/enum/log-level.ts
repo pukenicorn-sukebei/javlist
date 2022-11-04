@@ -8,7 +8,7 @@ export enum LogLevel {
 
 export const LogLevelDefault = LogLevel.Log as const
 
-export function parseLogLevel(logLevel: string): LogLevel {
+export function parseLogLevel(logLevel: string | undefined): LogLevel {
   return (
     Object.values(LogLevel).find((ll) => ll === logLevel) || LogLevelDefault
   )
