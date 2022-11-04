@@ -24,11 +24,10 @@ export default registerAs<AppConfig>(
       nodeEnv: process.env[Env.App.NodeEnv],
       debug: process.env[Env.App.NodeEnv] !== 'production',
       name: process.env[Env.App.AppName],
-      port:
-        parseInt(
-          process.env[Env.App.AppPort] || process.env[Env.App.Port],
-          10,
-        ) || 3000,
+      port: parseInt(
+        process.env[Env.App.AppPort] || process.env[Env.App.Port] || '3000',
+        10,
+      ),
       apiPrefix: process.env[Env.App.ApiPrefix],
       logLevel: parseLogLevel(process.env[Env.App.LogLevel]),
     }),

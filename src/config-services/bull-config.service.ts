@@ -13,8 +13,8 @@ export class BullConfigService implements SharedBullConfigurationFactory {
   private readonly redisConfig: RedisConfig
 
   constructor(configService: ConfigService) {
-    this.featureConfig = configService.get<FeatureConfig>(ConfigName.Feature)
-    this.redisConfig = configService.get<RedisConfig>(ConfigName.Redis)
+    this.featureConfig = configService.get<FeatureConfig>(ConfigName.Feature)!
+    this.redisConfig = configService.get<RedisConfig>(ConfigName.Redis)!
   }
 
   createSharedConfiguration():

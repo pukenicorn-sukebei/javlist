@@ -22,7 +22,6 @@ import { ConfigName } from '@_enum/config'
 import { LogLevel } from '@_enum/log-level'
 
 import { AppModule } from './app.module'
-// import { SerializerInterceptor } from './utils/serializer.interceptor'
 import validationOptions from './utils/validation-options'
 
 DayJS.extend(DayJS_UTC)
@@ -39,8 +38,8 @@ async function bootstrap() {
   )
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
   const configService = app.get(ConfigService)
-  const appConfig = configService.get<AppConfig>(ConfigName.App)
-  const swaggerConfig = configService.get<SwaggerConfig>(ConfigName.Swagger)
+  const appConfig = configService.get<AppConfig>(ConfigName.App)!
+  const swaggerConfig = configService.get<SwaggerConfig>(ConfigName.Swagger)!
 
   app.enableShutdownHooks()
   app.useLogger(getLoggerLogLevel(appConfig))
@@ -63,7 +62,7 @@ function getFastifyInstance(): FastifyInstance {
 }
 
 function getLoggerLogLevel(appConfig: AppConfig) {
-  const logLevels = []
+  const logLevels: LogLevel[] = []
   // noinspection FallThroughInSwitchStatementJS
   switch (appConfig.logLevel) {
     case LogLevel.Verbose:

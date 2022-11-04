@@ -29,7 +29,7 @@ export class GraphqlConfigService
     private readonly videoService: VideosService,
     private readonly prisma: PrismaClient,
   ) {
-    this.appConfig = configService.get<AppConfig>(ConfigName.App)
+    this.appConfig = configService.get<AppConfig>(ConfigName.App)!
   }
 
   createGqlOptions():

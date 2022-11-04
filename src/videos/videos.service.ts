@@ -90,7 +90,7 @@ export class VideosService {
         throw new BadRequestException(
           'Can not paginate when `codes` is present',
         )
-      } else if (codes.length > pagination.amount) {
+      } else if (codes.length > pagination.amount!) {
         throw new BadRequestException(
           '`codes` can not be larger than page size',
         )
@@ -205,7 +205,7 @@ export class VideosService {
       subscription?.unsubscribe()
     })
 
-    await this.pornScraperQueue.add({ code }, { jobId: code })
+    await this.pornScraperQueue!.add({ code }, { jobId: code })
 
     return resultPromise
   }

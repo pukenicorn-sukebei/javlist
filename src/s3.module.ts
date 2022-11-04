@@ -13,13 +13,13 @@ import { ConfigName } from '@_enum/config'
       useFactory: (configService: ConfigService) => {
         const s3Config = configService.get<S3Config>(ConfigName.S3)
 
-        if (!s3Config.region) {
+        if (!s3Config!.region) {
           throw new Error('S3 region is missing')
         }
 
         return new S3Client({
-          endpoint: s3Config.endpoint,
-          region: s3Config.region,
+          endpoint: s3Config!.endpoint,
+          region: s3Config!.region,
         })
       },
     },
