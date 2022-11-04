@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   api:
-    build: .
+    build:
+      context: .
+      args:
+        SUKEBEI_PKG_TOKEN: ${SUKEBEI_PKG_TOKEN}
     ports:
       - '3000:3000'
     environment:
@@ -12,6 +15,7 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_S3_BUCKET__ASSET__NAME: ${AWS_S3_BUCKET__ASSET__NAME}
+      REDIS_HOST: redis
   postgres:
     image: postgres:alpine
     ports:
