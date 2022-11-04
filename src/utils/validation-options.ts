@@ -13,15 +13,18 @@ const validationOptions: ValidationPipeOptions = {
     new HttpException(
       {
         status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: errors.reduce(
-          (accumulator, currentValue) => ({
-            ...accumulator,
-            [currentValue.property]: Object.values(
-              currentValue.constraints,
-            ).join(', '),
-          }),
-          {},
-        ),
+        errors: errors.reduce((accumulator, currentValue) => {
+          if (currentValue.constraints) {
+            return {
+              ...accumulator,
+              [currentValue.property]: Object.values(
+                currentValue.constraints,
+              ).join(', '),
+            }
+          } else {
+            return accumulator
+          }
+        }, {}),
       },
       HttpStatus.UNPROCESSABLE_ENTITY,
     ),

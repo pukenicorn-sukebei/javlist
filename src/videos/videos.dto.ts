@@ -1,5 +1,7 @@
 import { Prisma } from '@_generated/prisma'
 
+import VideoArgs = Prisma.VideoArgs
+
 export const VideosDefaultInclude = {
   label: true,
   maker: true,
@@ -12,7 +14,7 @@ export const VideosDefaultInclude = {
   tags: true,
 }
 export type VideoWithInclude<
-  IC = {
+  IC extends boolean | VideoArgs | null | undefined = {
     include: typeof VideosDefaultInclude
   },
 > = Prisma.VideoGetPayload<IC>
@@ -20,14 +22,14 @@ export type VideoWithInclude<
 export class VideoDto {
   id: string
   code: string
-  name?: string
-  releaseDate?: Date
+  name?: string | null
+  releaseDate?: Date | null
   length: number
   // createdAt: Date
   // updatedAt: Date
   coverUrl: string
-  maker: string
-  label: string
+  maker?: string | null
+  label?: string | null
   tags: string[]
   directors: string[]
   actors: string[]

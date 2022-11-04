@@ -46,7 +46,7 @@ export class VideosModule {
     }
 
     if (enableScraperQueue) {
-      module.imports.push(
+      module.imports!.push(
         BullModule.registerQueue({
           name: QueueName.PornScraper,
           prefix: 'PORN_SCRAPER->',
