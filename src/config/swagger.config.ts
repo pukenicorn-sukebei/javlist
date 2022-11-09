@@ -10,6 +10,7 @@ export class SwaggerConfig {
 
   enabled: boolean
   path: string
+  filePath?: string
   title: string
   description: string
   version: string
@@ -21,11 +22,14 @@ export default registerAs<SwaggerConfig>(
     new SwaggerConfig({
       enabled: process.env[Env.Swagger.Enabled]?.toLowerCase() === 'true',
       path: process.env[Env.Swagger.Path] || 'swagger',
+      filePath: process.env[Env.Swagger.FilePath],
       title:
         process.env[Env.Swagger.Name] ||
         process.env[Env.App.AppName] ||
-        'title',
-      description: process.env[Env.Swagger.Description] || 'description',
+        'Porn Scraper',
+      description:
+        process.env[Env.Swagger.Description] ||
+        'Scrapes porn information and store them',
       version: '1.0',
     }),
 )

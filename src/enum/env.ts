@@ -38,6 +38,7 @@ class S3 {
 enum Swagger {
   Enabled = 'SWAGGER_ENABLED',
   Path = 'SWAGGER_PATH',
+  FilePath = 'SWAGGER_FILE_PATH',
   Name = 'SWAGGER_NAME',
   Description = 'SWAGGER_DESCRIPTION',
 }
