@@ -34,4 +34,4 @@ jobs:
     secrets:
       REGISTRY_USERNAME: ${{ github.actor }}
       BUILD_ARGS: |
-        SUKEBEI_PKG_TOKEN=${{ github.token }}
+        SUKEBEI_PKG_TOKEN=${{ secrets.PKG_TOKEN || github.token }}
