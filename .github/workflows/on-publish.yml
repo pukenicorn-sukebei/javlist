@@ -35,3 +35,31 @@ jobs:
       REGISTRY_USERNAME: ${{ github.actor }}
       BUILD_ARGS: |
         SUKEBEI_PKG_TOKEN=${{ secrets.PKG_TOKEN || github.token }}
+
+  publish-client-ts-axios:
+    name: Build and publish typescript axios client
+    needs: [ test ]
+    uses: pukenicorn/gh-workflows/.github/workflows/publish-pkg.yml@main
+    with:
+      base-language: node
+      package-path: ./generated/typescript
+      post-setup-command: generate:client-ts-axios
+      package-name: "@${{ github.repository }}-client"
+      package-registry: https://npm.pkg.github.com
+      package-version: ${{ github.event.release.tag_name }}
+    if: github.event_name == 'release' && github.event.action == 'published'
+
+  publish-client-cs-netcore:
+    name: Build and publish c# netcore client
+    needs: [ test ]
+    uses: pukenicorn/gh-workflows/.github/workflows/publish-pkg.yml@main
+    with:
+      base-language: node
+      package-language: dotnet
+      package-language-cache: none
+      package-path: ./generated/cs
+      post-setup-command: generate:client-cs-netcore
+      package-name: Pukenicorn.Sukebei.JavList.Client
+      package-registry: https://npm.pkg.github.com
+      package-version: ${{ github.event.release.tag_name }}
+    if: github.event_name == 'release' && github.event.action == 'published'
