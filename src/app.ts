@@ -1,5 +1,6 @@
 import {
   INestApplication,
+  InternalServerErrorException,
   ValidationPipe,
   VersioningType,
 } from '@nestjs/common'
@@ -16,6 +17,7 @@ import * as DayJS_UTC from 'dayjs/plugin/utc'
 import Fastify from 'fastify'
 import { FastifyInstance } from 'fastify/types/instance'
 import * as Fs from 'fs'
+import * as Yaml from 'js-yaml'
 
 import { AppConfig } from '@_config/app.config'
 import { SwaggerConfig } from '@_config/swagger.config'
@@ -39,7 +41,12 @@ export async function runApp() {
 
 function _getConfig<T>(app: INestApplication, configName: ConfigName): T {
   const configService = app.get(ConfigService)
-  return configService.get<T>(configName)
+  const config = configService.get<T>(configName)
+  if (config) {
+    return config
+  } else {
+    throw new InternalServerErrorException(`Config not found: ${configName}`)
+  }
 }
 
 ////////getNestApp////////////////////////////////////////////////////////////////////////
@@ -77,7 +84,7 @@ function getFastifyInstance(): FastifyInstance {
 }
 
 function getLoggerLogLevel(appConfig: AppConfig) {
-  const logLevels = []
+  const logLevels: LogLevel[] = []
   // noinspection FallThroughInSwitchStatementJS
   switch (appConfig.logLevel) {
     case LogLevel.Verbose:
@@ -109,7 +116,7 @@ function setupSwagger(app: INestApplication): void {
     SwaggerModule.setup(swaggerConfig.path, app, document)
 
     if (swaggerConfig.filePath) {
-      Fs.writeFileSync(swaggerConfig.filePath, JSON.stringify(document))
+      Fs.writeFileSync(swaggerConfig.filePath, Yaml.dump(document))
     }
   }
 }

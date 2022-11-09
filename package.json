@@ -17,7 +17,9 @@
     "migration:reset": "dotenv prisma migrate reset",
     "migration:run": "dotenv prisma migrate deploy",
     "generate": "dotenv yarn prisma generate",
-    "generate:swagger": "ts-node --project tsconfig.tsc.json ./src/generate-openapi.ts",
+    "generate:spec": "ts-node --project tsconfig.tsc.json ./src/generate-openapi.ts",
+    "generate:client-ts-axios": "make genc-axios",
+    "generate:client-cs-netcore": "make genc-cs-netcore",
     "generate:ts-post": "tsc -p tsconfig.generated.json && rimraf generated-ts",
     "prebuild": "rimraf dist",
     "build": "nest build",
@@ -66,7 +68,8 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.5.7",
     "source-map-support": "^0.5.21",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "yaml-js": "^0.3.1"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
@@ -77,6 +80,7 @@
     "@types/bull": "^3.15.9",
     "@types/cache-manager": "^4.0.2",
     "@types/jest": "^29.2.2",
+    "@types/js-yaml": "^4.0.5",
     "@types/node": "^18.11.9",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.40.1",
