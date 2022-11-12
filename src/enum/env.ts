@@ -1,5 +1,6 @@
 enum App {
   NodeEnv = 'NODE_ENV',
+  AppEnv = 'APP_ENV',
   AppName = 'APP_NAME',
   Port = 'PORT',
   AppPort = 'APP_PORT',
