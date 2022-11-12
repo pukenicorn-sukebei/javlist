@@ -10,6 +10,7 @@ export class AppConfig {
   }
 
   nodeEnv: string
+  appEnv: string
   debug: boolean
   name?: string
   port: number
@@ -22,7 +23,8 @@ export default registerAs<AppConfig>(
   () =>
     new AppConfig({
       nodeEnv: process.env[Env.App.NodeEnv],
-      debug: process.env[Env.App.NodeEnv] !== 'production',
+      appEnv: process.env[Env.App.AppEnv] || 'development',
+      debug: process.env[Env.App.AppEnv] !== 'production',
       name: process.env[Env.App.AppName],
       port: parseInt(
         process.env[Env.App.AppPort] || process.env[Env.App.Port] || '3000',

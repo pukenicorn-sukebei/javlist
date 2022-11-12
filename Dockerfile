@@ -1,5 +1,7 @@
 FROM node:alpine as base
 
+ARG APP_ENV=production
+ENV APP_ENV=${APP_ENV}
 ENV NODE_ENV=production
 ENV PATH=/app/node_modules/.bin:$PATH
 

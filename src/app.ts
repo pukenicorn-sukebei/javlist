@@ -109,7 +109,7 @@ function setupSwagger(app: INestApplication): void {
       .setTitle(swaggerConfig.title)
       .setDescription(swaggerConfig.description)
       .setVersion(swaggerConfig.version)
-      .addBearerAuth()
+      // .addBearerAuth()
       .build()
 
     const document = SwaggerModule.createDocument(app, options)
