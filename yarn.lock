@@ -1970,20 +1970,20 @@
   dependencies:
     axios "0.27.2"
 
-"@nestjs/bull-shared@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@nestjs/bull-shared/-/bull-shared-0.1.1.tgz#af59527a40170d8355a575f83b92d0d75334c50c"
-  integrity sha512-As/h1u300l7oE6DOhWdCk6bqhae698rMWshQjKeaDcwOhfDB70IKn09IMBF6yqhTQFZHuAF1IxELrmDsaffACw==
+"@nestjs/bull-shared@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/bull-shared/-/bull-shared-0.1.2.tgz#23efa4e4fb11dd464ecb9daa3f93ffe409c098df"
+  integrity sha512-q1JqieWb2YjA6OIal5XjtbF28LgJxEflwJB9x3OnE2OUgI0kWvaMlYMaW3opFmgcWPjx4o5lVhcGnwXeIhZfgg==
   dependencies:
-    tslib "2.4.0"
+    tslib "2.4.1"
 
-"@nestjs/bull@^0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@nestjs/bull/-/bull-0.6.1.tgz#be825215b2958a9131c6534eb174ee96a5093966"
-  integrity sha512-UnPQLWzns6egWa6Satbg6R+G+x+aYbVzg/s1t9Bl6uehxjE1FfzwVBEii2xBmwzMB1YYg7nIDOUP4/gjhr2Xrg==
+"@nestjs/bull@^0.6.2":
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/bull/-/bull-0.6.2.tgz#2f32e8e08d1aaed5d4bc7459bd4ceb67fab89320"
+  integrity sha512-tx5wiIGgfYEj5RAJA1B23pn/63nsmMH0f981V1/v3NKyE07NsvOXCrwKNGQnIZZlXkXh7lgx2I80/tYwPGnVIg==
   dependencies:
-    "@nestjs/bull-shared" "^0.1.1"
-    tslib "2.4.0"
+    "@nestjs/bull-shared" "^0.1.2"
+    tslib "2.4.1"
 
 "@nestjs/cli@^9.1.4":
   version "9.1.4"
