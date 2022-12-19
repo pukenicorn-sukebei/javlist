@@ -1596,10 +1596,10 @@
     readable-stream "^4.0.0"
     send "^0.18.0"
 
-"@fastify/swagger@^8.2.0":
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/@fastify/swagger/-/swagger-8.2.0.tgz#dcd3233c9911f965668c85a4d7d02a491bafe2ef"
-  integrity sha512-AnVQjuBxvJ7TVEtmCi2f1WSGGdQlXD3MJ6pt34fp1JYm2OZj3ZQ7n4D0ODUrjdKSLIapTH2PdlXZ2iXPE2OZlQ==
+"@fastify/swagger@^8.2.1":
+  version "8.2.1"
+  resolved "https://registry.yarnpkg.com/@fastify/swagger/-/swagger-8.2.1.tgz#a5f744868c25c49bde2469f5412ce0405aac150a"
+  integrity sha512-nYP/3ncrI5YmaGiJf6m+CLdFrdlWSsASHBPqP9uN9/oFFwDJwdUtq0ylmvObxzqWNVt9zT50iT/uvIndVEsvbg==
   dependencies:
     fastify-plugin "^4.0.0"
     json-schema-resolver "^2.0.0"
