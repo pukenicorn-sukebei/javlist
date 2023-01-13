@@ -162,7 +162,7 @@ export class FilesService {
       return url
     })
 
-    await this.cacheManager.set(cacheKey, preSignedUrl, { ttl: age * 0.75 })
+    await this.cacheManager.set(cacheKey, preSignedUrl, age * 0.75)
 
     return preSignedUrl
   }
