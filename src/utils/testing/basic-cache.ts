@@ -1,6 +1,7 @@
 import { CACHE_MANAGER } from '@nestjs/common'
 import { Provider } from '@nestjs/common/interfaces/modules/provider.interface'
-import { Cache, Store, WrapArgsType } from 'cache-manager'
+import { Cache, Store } from 'cache-manager'
+import { Ttl } from 'cache-manager/dist/caching'
 
 export const BasicCacheProvider: Provider = {
   provide: CACHE_MANAGER,
@@ -11,10 +12,11 @@ export class BasicCache implements Cache {
   private values: Record<string, any> = {}
   store: Store
 
-  set<T>(key: string, value: T): Promise<T> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  set<T>(key: string, value: T, ttl?: Ttl): Promise<void> {
     console.log('set ', key, ' -> ', value)
     this.values[key] = value
-    return Promise.resolve(value)
+    return Promise.resolve()
   }
 
   get<T>(key: string): Promise<T | undefined> {
@@ -23,7 +25,7 @@ export class BasicCache implements Cache {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  wrap<T>(...args: WrapArgsType<T>[]): Promise<T> {
+  wrap<T>(key: string, fn: () => Promise<T>, ttl?: Ttl): Promise<T> {
     return Promise.reject()
   }
 
