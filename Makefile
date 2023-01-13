@@ -16,6 +16,6 @@ generate-client-cs-netcore genc-cs-netcore: gen-spec
 		--user $$(id -u):$$(id -g) \
 		-v "$(dir $(abspath $(lastword $(MAKEFILE_LIST)))):/local" openapitools/openapi-generator-cli generate \
 		-g csharp-netcore \
-		--additional-properties=targetFramework=net6.0,packageName=${PACKAGE_NAME} \
+		--additional-properties=targetFramework=net7.0,packageName=${PACKAGE_NAME} \
 		-i /local/generated/openapi.yml \
 		-o /local/generated/cs
