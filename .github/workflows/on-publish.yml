@@ -60,6 +60,6 @@ jobs:
       package-path: ./generated/cs
       post-setup-command: generate:client-cs-netcore
       package-name: Pukenicorn.Sukebei.JavList.Client
-      package-registry: https://npm.pkg.github.com
+      package-registry: https://npm.pkg.github.com/${{ github.repository_owner }}/index.json
       package-version: ${{ github.event.release.tag_name }}
     if: github.event_name == 'release' && github.event.action == 'published'
