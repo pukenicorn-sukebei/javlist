@@ -1,21 +1,39 @@
 generate-spec gen-spec:
 	yarn run generate:spec
 
-generate-client-ts-axios genc-axios: gen-spec
+generate-client-ts-config genc-ts-conf:
+	@cat << EOL >> generator-config.json
+	  {
+		"supportsES6": true,
+		"npmName": "${PACKAGE_NAME}",
+		"npmRepository": "${PACKAGE_REPOSITORY}"
+	  }
+	EOF
+
+generate-client-ts-axios genc-axios: gen-spec genc-ts-conf
 	docker run --rm \
 		--user $$(id -u):$$(id -g) \
 		-v "$(dir $(abspath $(lastword $(MAKEFILE_LIST)))):/local" openapitools/openapi-generator-cli generate \
 		-g typescript-axios \
-		--additional-properties=supportsES6=true,npmName=${PACKAGE_NAME},npmRepository=${PACKAGE_REPOSITORY} \
 		-i /local/generated/openapi.yml \
-		-o /local/generated/typescript
+		-o /local/generated/typescript \
+		-c /local/generator-config.json
 
+generate-client-cs-config genc-cs-conf:
+	@cat << EOL >> generator-config.json
+	  {
+		"targetFramework": "net7.0",
+		"netCoreProjectFile": true,
+		"packageName": "${PACKAGE_NAME}",
+		"apiName": "${PACKAGE_REPOSITORY:-awaefwef}",
+		"library": "httpclient"
+	  }
+	EOF
 
-generate-client-cs-netcore genc-cs-netcore: gen-spec
+generate-client-cs-netcore genc-cs-netcore:
 	docker run --rm \
-		--user $$(id -u):$$(id -g) \
 		-v "$(dir $(abspath $(lastword $(MAKEFILE_LIST)))):/local" openapitools/openapi-generator-cli generate \
 		-g csharp-netcore \
-		--additional-properties=targetFramework=net7.0,packageName=${PACKAGE_NAME} \
 		-i /local/generated/openapi.yml \
-		-o /local/generated/cs
+		-o /local/generated/cs \
+		-c /local/generator-config.json
