@@ -2,13 +2,11 @@ generate-spec gen-spec:
 	yarn run generate:spec
 
 generate-client-ts-config genc-ts-conf:
-	@cat << EOL >> generator-config.json
-	  {
-		"supportsES6": true,
-		"npmName": "${PACKAGE_NAME}",
-		"npmRepository": "${PACKAGE_REPOSITORY}"
-	  }
-	EOF
+	@echo '{ \
+		"supportsES6": true, \
+		"npmName": "${PACKAGE_NAME}", \
+		"npmRepository": "${PACKAGE_REPOSITORY}" \
+	  }' > generator-config.json
 
 generate-client-ts-axios genc-axios: gen-spec genc-ts-conf
 	docker run --rm \
@@ -20,15 +18,14 @@ generate-client-ts-axios genc-axios: gen-spec genc-ts-conf
 		-c /local/generator-config.json
 
 generate-client-cs-config genc-cs-conf:
-	@cat << EOL >> generator-config.json
-	  {
-		"targetFramework": "net7.0",
-		"netCoreProjectFile": true,
-		"packageName": "${PACKAGE_NAME}",
-		"apiName": "${PACKAGE_REPOSITORY:-awaefwef}",
-		"library": "httpclient"
-	  }
-	EOF
+	@printf '{ \
+		"targetFramework": "net7.0", \
+		"netCoreProjectFile": true, \
+		"packageName": "${PACKAGE_NAME}", \
+		"library": "httpclient", \
+		"sourceFolder": "/" \
+	  }' > generator-config.json
+	cat generator-config.json
 
 generate-client-cs-netcore genc-cs-netcore:
 	docker run --rm \
