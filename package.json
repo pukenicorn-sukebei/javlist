@@ -17,7 +17,7 @@
     "migration:reset": "dotenv prisma migrate reset",
     "migration:run": "dotenv prisma migrate deploy",
     "generate": "dotenv yarn prisma generate",
-    "generate:spec": "ts-node --project tsconfig.tsc.json ./src/generate-openapi.ts",
+    "generate:spec": "nest start --entryFile generate-openapi",
     "generate:client-ts-axios": "make genc-axios",
     "generate:client-cs-netcore": "make genc-cs-netcore",
     "generate:ts-post": "tsc -p tsconfig.generated.json && rimraf generated-ts",
