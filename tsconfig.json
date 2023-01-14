@@ -6,7 +6,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2018",
+    "target": "es2022",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./src",
@@ -18,14 +18,30 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@_config-services/*": ["config-services/*"],
-      "@_clients/*": ["clients/*"],
-      "@_config/*": ["config/*"],
-      "@_enum/*": ["enum/*"],
-      "@_database/*": ["database/*"],
-      "@_generated/*": ["../generated/*"],
-      "@_logger": ["logger"],
-      "@_utils/*": ["utils/*"]
+      "@_config-services/*": [
+        "config-services/*"
+      ],
+      "@_clients/*": [
+        "clients/*"
+      ],
+      "@_config/*": [
+        "config/*"
+      ],
+      "@_enum/*": [
+        "enum/*"
+      ],
+      "@_database/*": [
+        "database/*"
+      ],
+      "@_generated/*": [
+        "../generated/*"
+      ],
+      "@_logger": [
+        "logger"
+      ],
+      "@_utils/*": [
+        "utils/*"
+      ]
     }
   },
   "include": [
