@@ -256,3 +256,4 @@ Temporary Items
 /.dev
 /generated
 /generated-ts
+/generator-config.json

@@ -47,8 +47,8 @@ jobs:
       package-version: ${{ github.event.release.tag_name }}
     if: github.event_name == 'release' && github.event.action == 'published'
 
-  publish-client-cs-netcore-v6:
-    name: Build and publish c# netcore client v6
+  publish-client-cs-netcore:
+    name: Build and publish c# netcore client
     needs: [ test ]
     uses: pukenicorn/gh-workflows/.github/workflows/publish-pkg.yml@main
     with:
@@ -58,23 +58,6 @@ jobs:
       package-path: ./generated/cs
       post-setup-command: generate:client-cs-netcore
       package-name: Pukenicorn.Sukebei.JavList.Client
-      package-sdk-version: '6.0'
       package-registry: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-      package-version: 6.${{ github.event.release.tag_name }}
-    if: github.event_name == 'release' && github.event.action == 'published'
-
-  publish-client-cs-netcore-v7:
-    name: Build and publish c# netcore client v7
-    needs: [ test ]
-    uses: pukenicorn/gh-workflows/.github/workflows/publish-pkg.yml@main
-    with:
-      base-language: node
-      package-language: dotnet
-      package-language-cache: none
-      package-path: ./generated/cs
-      post-setup-command: generate:client-cs-netcore
-      package-name: Pukenicorn.Sukebei.JavList.Client
-      package-sdk-version: '7.0'
-      package-registry: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-      package-version: 7.${{ github.event.release.tag_name }}
+      package-version: ${{ github.event.release.tag_name }}
     if: github.event_name == 'release' && github.event.action == 'published'

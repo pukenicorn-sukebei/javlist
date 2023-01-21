@@ -14,7 +14,7 @@ generate-client-ts-axios genc-axios: gen-spec genc-ts-conf
 		-c /local/generator-config.json
 
 generate-client-cs-config genc-cs-conf:
-	@echo '{ "targetFramework": "net7.0", "netCoreProjectFile": true, "packageName": "${PACKAGE_NAME}", "library": "httpclient", "sourceFolder": "/" }' > generator-config.json
+	@echo '{ "targetFramework": "net6.0;net7.0", "netCoreProjectFile": true, "packageName": "${PACKAGE_NAME}", "library": "httpclient", "sourceFolder": "/" }' > generator-config.json
 
 generate-client-cs-netcore genc-cs-netcore: gen-spec genc-cs-conf
 	docker run --rm \
