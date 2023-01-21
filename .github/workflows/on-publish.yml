@@ -48,7 +48,7 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
 
   publish-client-cs-netcore-v6:
-    name: Build and publish c# netcore client
+    name: Build and publish c# netcore client v6
     needs: [ test ]
     uses: pukenicorn/gh-workflows/.github/workflows/publish-pkg.yml@main
     with:
@@ -64,7 +64,7 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
 
   publish-client-cs-netcore-v7:
-    name: Build and publish c# netcore client
+    name: Build and publish c# netcore client v7
     needs: [ test ]
     uses: pukenicorn/gh-workflows/.github/workflows/publish-pkg.yml@main
     with:
