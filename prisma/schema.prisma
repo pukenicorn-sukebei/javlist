@@ -24,7 +24,7 @@ model Video {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   coverPath   String
-  kind        VideoKind
+  kind        VideoKind  @default(Jav)
   label       VideoLabel @relation(fields: [labelId], references: [id])
   maker       VideoMaker @relation(fields: [makerId], references: [id])
   tags        VideoTag[] @relation("VideoToVideoTag")
