@@ -30,7 +30,7 @@ export class PornScraperService {
             )
           }
         }
-        throw new InternalServerErrorException(err)
+        throw new InternalServerErrorException(null, err)
       })
   }
 }
