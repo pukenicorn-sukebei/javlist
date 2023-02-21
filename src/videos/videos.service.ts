@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   Optional,
   RequestTimeoutException,
 } from '@nestjs/common'
@@ -15,6 +16,7 @@ import { PrismaClient } from '@_generated/prisma'
 import { Logger } from '@_logger'
 import { stringifyAliases } from '@_utils/alias'
 import { paginationToPrismaArgs } from '@_utils/infinity-pagination'
+import * as NormalizerUtils from '@_utils/normalizer'
 import { IPaginationOptions } from '@_utils/types/pagination-options'
 
 import { FilesService } from '../files/files.service'
@@ -66,19 +68,22 @@ export class VideosService {
     code: string,
     { forceUpdate = false } = {},
   ): Promise<VideoWithInclude> {
+    const normalizedCode = NormalizerUtils.normalizeCode(code)
+    if (!normalizedCode) throw new NotFoundException('Invalid code')
+
     const video = await this.prisma.video.findUnique({
       include: VideosDefaultInclude,
-      where: { code },
+      where: { code: normalizedCode },
     })
     if (!forceUpdate && video) {
       return video
     }
 
     this.logger.verbose(
-      `[findByCode] fetching [${code}]; [forceUpdate]: ${forceUpdate}`,
+      `[findByCode] fetching [${normalizedCode}]; [forceUpdate]: ${forceUpdate}`,
     )
 
-    return this._fetchFromScraper(code)
+    return this._fetchFromScraper(normalizedCode)
   }
 
   async findAll(
@@ -95,6 +100,9 @@ export class VideosService {
           '`codes` can not be larger than page size',
         )
       }
+      codes = codes
+        .map(NormalizerUtils.normalizeCode)
+        .filter((x) => x) as string[]
     }
 
     const videos = await this.prisma.video.findMany({
