@@ -5,6 +5,7 @@ import {
   File,
   FileType,
   PersonAlias,
+  VideoKind,
   VideoLabel,
   VideoMaker,
   VideoTag,
@@ -74,6 +75,7 @@ export function mockPersonWithAliases(): PersonWithAliases {
 export function mockVideoWithInclude(): VideoWithInclude {
   return {
     id: Faker.datatype.uuid(),
+    kind: Faker.helpers.arrayElement(VideoKind[Symbol.iterator]),
     code: Faker.hacker.abbreviation(),
     name: Faker.commerce.productDescription(),
     releaseDate: Faker.date.past(),

@@ -24,9 +24,10 @@ model Video {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   coverPath   String
+  kind        VideoKind
   label       VideoLabel @relation(fields: [labelId], references: [id])
   maker       VideoMaker @relation(fields: [makerId], references: [id])
-  tags        VideoTag[]
+  tags        VideoTag[] @relation("VideoToVideoTag")
   directors   Person[]   @relation("VideosDirected")
   actors      Person[]   @relation("VideosStarred")
 }
@@ -34,7 +35,7 @@ model Video {
 model VideoTag {
   id     String  @id @default(uuid())
   name   String  @unique
-  videos Video[]
+  videos Video[] @relation("VideoToVideoTag")
 }
 
 model Person {
@@ -80,6 +81,10 @@ model File {
   uploadedBucket String
 
   @@unique([type, uploadedPath])
+}
+
+enum VideoKind {
+  Jav
 }
 
 enum FileType {

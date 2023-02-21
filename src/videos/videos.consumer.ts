@@ -21,7 +21,7 @@ import { Observer, Subject, Subscription, noop } from 'rxjs'
 
 import { PornScraperService } from '@_clients/porn-scraper.service'
 import { QueueName } from '@_enum/queue'
-import { FileType, Prisma, PrismaClient } from '@_generated/prisma'
+import { FileType, Prisma, PrismaClient, VideoKind } from '@_generated/prisma'
 import { Logger } from '@_logger'
 
 import { FilesService } from '../files/files.service'
@@ -107,6 +107,8 @@ export class VideosConsumer {
     > = {
       code: data.code.trim(),
       name: data.name.trim(),
+      // TODO get kind from from response
+      kind: VideoKind.Jav,
       releaseDate,
       coverPath: cover.uploadedPath,
       length: 0,
