@@ -36,6 +36,7 @@ describe('Normalizer Utils', () => {
         { input: 'IBW-873z', output: 'IBW-873z' },
         { input: 'hhd800.com@MIDV-041.mp4', output: 'MIDV-041' },
         { input: 'hhd800_com_MIDV-041_mp4', output: 'MIDV-041' },
+        { input: 'icao.me@ipvr00142.part2.mp4', output: 'IPVR-142' },
       ])('$input -> $output', ({ input, output }) =>
         expect(NormalizerUtils.normalizeCode(input)).toEqual(output),
       )

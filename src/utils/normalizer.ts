@@ -1,10 +1,10 @@
 import { VideoKind } from '@_generated/prisma'
 
 const extractorRegexes = {
-  [VideoKind.Jav]: /([A-Za-z]{2,6}|t-?28)[ \-_]?(\d+)([ez])?/i
+  [VideoKind.Jav]: /([A-Za-z]{2,6}|t-?28)[ \-_]?(\d+)([ez])?/i,
 }
 
-const badWordRegex = /hhd800|@|\.com|\.(?:avi|mp4)$/i
+const badWordRegex = /hhd800|@|\.com|icao.me|\.(?:avi|mp4|mkv|wmv)$/i
 
 export function normalizeCode(code: string): string | null {
   code = code.replace(badWordRegex, '')
