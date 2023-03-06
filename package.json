@@ -97,7 +97,7 @@
     "jest-mock-extended": "^3.0.1",
     "lint-staged": "^13.1.0",
     "prettier": "^2.7.1",
-    "prisma": "^4.9.0",
+    "prisma": "^4.11.0",
     "supertest": "^6.3.3",
     "ts-jest": "^29.0.3",
     "ts-loader": "^9.4.2",
