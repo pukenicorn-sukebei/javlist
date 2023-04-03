@@ -47,7 +47,7 @@
     "@nestjs/graphql": "^11.0.4",
     "@nestjs/jwt": "^9.0.0",
     "@nestjs/mercurius": "^10.1.7",
-    "@nestjs/platform-fastify": "^9.2.1",
+    "@nestjs/platform-fastify": "^9.3.12",
     "@nestjs/swagger": "^6.1.4",
     "@prisma/client": "^4.9.0",
     "@pukenicorn-sukebei/porn-scraper-client": "^1.0.2",
