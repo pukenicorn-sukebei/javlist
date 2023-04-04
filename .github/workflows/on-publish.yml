@@ -12,6 +12,11 @@ on:
   release:
     types: [ published ]
   workflow_dispatch:
+    inputs:
+      version:
+        description: Version to the publish package
+        type: string
+        required: true
 
 
 jobs:
@@ -40,11 +45,11 @@ jobs:
     uses: pukenicorn/gh-workflows/.github/workflows/publish-pkg.yml@main
     with:
       base-language: node
-      package-path: ./generated/typescript
-      post-setup-command: generate:client-ts-axios
+      package-path: ./generated
+      post-setup-command: generate:spec
       package-name: "@${{ github.repository }}-client"
       package-registry: https://npm.pkg.github.com
-      package-version: ${{ github.event.release.tag_name }}
+      package-version: ${{ github.event.release.tag_name || inputs.version }}
     if: github.event_name == 'release' && github.event.action == 'published'
 
   publish-client-cs-netcore:
@@ -55,9 +60,23 @@ jobs:
       base-language: node
       package-language: dotnet
       package-language-cache: none
-      package-path: ./generated/cs
-      post-setup-command: generate:client-cs-netcore
+      package-path: ./generated
+      post-setup-command: generate:spec
       package-name: Pukenicorn.Sukebei.JavList.Client
       package-registry: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-      package-version: ${{ github.event.release.tag_name }}
+      package-version: ${{ github.event.release.tag_name || inputs.version }}
+    if: github.event_name == 'release' && github.event.action == 'published'
+
+  publish-client-dart:
+    name: Build and publish dart client
+    needs: [ test ]
+    uses: pukenicorn/gh-workflows/.github/workflows/publish-pkg.yml@main
+    with:
+      base-language: node
+      package-language: dart
+      package-language-cache: none
+      package-path: ./generated
+      post-setup-command: generate:spec
+      package-name: "javlist_client"
+      package-version: ${{ github.event.release.tag_name || inputs.version }}
     if: github.event_name == 'release' && github.event.action == 'published'
