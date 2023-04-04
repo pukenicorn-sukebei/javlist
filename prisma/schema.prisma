@@ -10,7 +10,8 @@ generator nexusPrisma {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DB_URL")
+  // url      = "postgresql://postgres:password@localhost:5432/javlist"
+  url      = "postgresql://sa_javlist:cfgaNvpxL58kNJcSkPjEfAvyuNcx49pL@mochi.pukenicorn.com:5432/javlist"
 }
 
 model Video {

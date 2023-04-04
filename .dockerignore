@@ -2,7 +2,6 @@
 /dist
 /test
 /generated
-/generated-ts
 /.dev
 
 **/utils/testing
