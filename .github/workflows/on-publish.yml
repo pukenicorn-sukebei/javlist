@@ -68,6 +68,8 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
 
   publish-client-dart:
+    permissions:
+      contents: write
     name: Build and publish dart client
     needs: [ test ]
     uses: pukenicorn/gh-workflows/.github/workflows/publish-pkg.yml@main
