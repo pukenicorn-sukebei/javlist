@@ -4,5 +4,6 @@ export enum ConfigName {
   PornScraper = 'porn-scraper',
   Redis = 'redis',
   S3 = 's3',
+  Cron = 'cron',
   Swagger = 'swagger',
 }

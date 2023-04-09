@@ -3,6 +3,7 @@ import { Module, OnModuleInit } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { GraphQLModule } from '@nestjs/graphql'
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius'
+import { ScheduleModule } from '@nestjs/schedule'
 import { instanceToPlain } from 'class-transformer'
 
 import { BullConfigService } from '@_config-services/bull-config.service'
@@ -25,6 +26,7 @@ import { VideosService } from './videos/videos.service'
       load: Configs,
       envFilePath: ['.env', '.env.dev', '.env.default'],
     }),
+    ScheduleModule.forRoot(),
     BullModule.forRootAsync({
       useClass: BullConfigService,
     }),

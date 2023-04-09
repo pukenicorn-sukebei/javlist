@@ -1,6 +1,7 @@
 import {
   DeleteObjectCommand,
   GetObjectCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3'
@@ -43,7 +44,7 @@ export class FilesService {
     private readonly s3Client: S3Client,
     configService: ConfigService,
   ) {
-    this.logger.setContext(FilesService.name)
+    this.logger.setContext(this.constructor.name)
     this.s3Config = configService.get<S3Config>(ConfigName.S3)!
 
     if (
@@ -167,7 +168,32 @@ export class FilesService {
     return preSignedUrl
   }
 
-  private async _delete(bucket: string, key: string): Promise<void> {
+  async _listFiles(bucket: string, prefix?: string): Promise<string[]> {
+    let continuationToken: string | undefined = undefined
+    const list: string[] = []
+
+    while (true) {
+      const res = await this.s3Client.send(
+        new ListObjectsV2Command({
+          Bucket: bucket,
+          Prefix: prefix,
+          ContinuationToken: continuationToken,
+        }),
+      )
+
+      list.push(...res.Contents!.map((c) => c.Key!))
+
+      if (res.NextContinuationToken) {
+        continuationToken = res.NextContinuationToken
+      } else {
+        break
+      }
+    }
+
+    return list
+  }
+
+  async _delete(bucket: string, key: string): Promise<void> {
     this.logger.verbose(`[Delete][${bucket}:${key}] Deleting`)
 
     await this.s3Client
@@ -185,6 +211,4 @@ export class FilesService {
         ),
       )
   }
-
-  // TODO remove un-binded records
 }

@@ -18,6 +18,9 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
+      "@_base/*": [
+        "base/*"
+      ],
       "@_config-services/*": [
         "config-services/*"
       ],

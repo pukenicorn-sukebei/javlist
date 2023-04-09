@@ -8,6 +8,10 @@ enum App {
   LogLevel = 'APP_LOG_LEVEL',
 }
 
+enum Cron {
+  CleanUpOrphanAssets = 'CRON_CLEANUP_ORPHAN_ASSETS',
+}
+
 enum Feature {
   CrawlerQueue = 'ENABLE_CRAWLER_QUEUE',
 }
@@ -46,6 +50,7 @@ enum Swagger {
 
 export class Env {
   static readonly App = App
+  static readonly Cron = Cron
   static readonly Feature = Feature
   static readonly PornScraper = PornScraper
   static readonly Redis = Redis
