@@ -53,7 +53,7 @@ export class VideosConsumer {
     private readonly filesService: FilesService,
     private readonly peopleService: PeopleService,
   ) {
-    this.logger.setContext(VideosConsumer.name)
+    this.logger.setContext(this.constructor.name)
     this.resultObservableSubj = new Subject<PornScraperJobResult>()
   }
 
