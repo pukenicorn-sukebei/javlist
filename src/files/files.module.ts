@@ -6,6 +6,7 @@ import { DatabaseModule } from '@_database/database.module'
 
 import { S3Module } from '../s3.module'
 import { FilesService } from './files.service'
+import { FilesTask } from './files.task'
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { FilesService } from './files.service'
     DatabaseModule,
     S3Module,
   ],
-  providers: [FilesService],
+  providers: [FilesService, FilesTask],
   exports: [FilesService],
 })
 export class FilesModule {}
