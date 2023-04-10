@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common'
 
-import { Person, PrismaClient } from '@_generated/prisma'
+import { PrismaService } from '@_database/prisma.service'
+import { Person } from '@_generated/prisma'
 
 @Injectable()
 export class PeopleService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   static readonly INCLUDES = {
     aliases: true,
