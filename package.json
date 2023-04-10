@@ -39,7 +39,7 @@
     "@mercuriusjs/gateway": "^1.2.0",
     "@nestjs/axios": "^2.0.0",
     "@nestjs/bull": "^0.6.3",
-    "@nestjs/common": "^9.3.12",
+    "@nestjs/common": "^9.4.0",
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.3.12",
     "@nestjs/graphql": "^11.0.4",
