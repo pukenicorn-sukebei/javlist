@@ -11,8 +11,8 @@ import { Queue } from 'bull'
 import { Subscription } from 'rxjs'
 
 import { PornScraperService } from '@_clients/porn-scraper.service'
+import { PrismaService } from '@_database/prisma.service'
 import { QueueName } from '@_enum/queue'
-import { PrismaClient } from '@_generated/prisma'
 import { Logger } from '@_logger'
 import { stringifyAliases } from '@_utils/alias'
 import { paginationToPrismaArgs } from '@_utils/infinity-pagination'
@@ -27,7 +27,7 @@ import { VideoDto, VideoWithInclude, VideosDefaultInclude } from './videos.dto'
 export class VideosService {
   constructor(
     private readonly logger: Logger,
-    private readonly prisma: PrismaClient,
+    private readonly prisma: PrismaService,
     private readonly pornScraperService: PornScraperService,
     private readonly filesService: FilesService,
     private readonly videosConsumer: VideosConsumer,
@@ -217,6 +217,4 @@ export class VideosService {
 
     return resultPromise
   }
-
-  // TODO remove file paths without record
 }

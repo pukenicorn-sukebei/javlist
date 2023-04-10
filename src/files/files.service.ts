@@ -20,8 +20,9 @@ import * as Path from 'path'
 import * as UUID from 'uuid'
 
 import { S3Config } from '@_config/s3.config'
+import { PrismaService } from '@_database/prisma.service'
 import { ConfigName } from '@_enum/config'
-import { File, FileType, Prisma, PrismaClient } from '@_generated/prisma'
+import { File, FileType, Prisma } from '@_generated/prisma'
 import { Logger } from '@_logger'
 import * as UrlUtils from '@_utils/url'
 
@@ -40,7 +41,7 @@ export class FilesService {
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     private readonly httpService: HttpService,
-    private readonly prisma: PrismaClient,
+    private readonly prisma: PrismaService,
     private readonly s3Client: S3Client,
     configService: ConfigService,
   ) {
