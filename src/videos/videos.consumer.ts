@@ -20,8 +20,9 @@ import * as DayJS from 'dayjs'
 import { Observer, Subject, Subscription, noop } from 'rxjs'
 
 import { PornScraperService } from '@_clients/porn-scraper.service'
+import { PrismaService } from '@_database/prisma.service'
 import { QueueName } from '@_enum/queue'
-import { FileType, Prisma, PrismaClient, VideoKind } from '@_generated/prisma'
+import { FileType, Prisma, VideoKind } from '@_generated/prisma'
 import { Logger } from '@_logger'
 
 import { FilesService } from '../files/files.service'
@@ -48,7 +49,7 @@ export class VideosConsumer {
 
   constructor(
     private readonly logger: Logger,
-    private readonly prisma: PrismaClient,
+    private readonly prisma: PrismaService,
     private readonly pornScraperService: PornScraperService,
     private readonly filesService: FilesService,
     private readonly peopleService: PeopleService,

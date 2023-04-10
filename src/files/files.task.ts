@@ -5,8 +5,8 @@ import { SchedulerRegistry } from '@nestjs/schedule'
 import { BaseTask } from '@_base/base.task'
 import { CronConfig } from '@_config/cron.config'
 import { S3Config } from '@_config/s3.config'
+import { PrismaService } from '@_database/prisma.service'
 import { ConfigName } from '@_enum/config'
-import { PrismaClient } from '@_generated/prisma'
 import { Logger } from '@_logger'
 
 import { FilesService } from './files.service'
@@ -17,7 +17,7 @@ export class FilesTask extends BaseTask {
 
   constructor(
     private readonly filesService: FilesService,
-    private readonly prisma: PrismaClient,
+    private readonly prisma: PrismaService,
     logger: Logger,
     schedulerRegistry: SchedulerRegistry,
     configService: ConfigService,

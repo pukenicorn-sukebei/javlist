@@ -1,20 +1,9 @@
 import { Module } from '@nestjs/common'
 
-import { PrismaClient } from '@_generated/prisma'
+import { PrismaService } from '@_database/prisma.service'
 
 @Module({
-  providers: [
-    {
-      provide: PrismaClient,
-      useFactory: () => {
-        const prisma = new PrismaClient()
-
-        // prisma.$use()
-
-        return prisma
-      },
-    },
-  ],
-  exports: [PrismaClient],
+  providers: [PrismaService],
+  exports: [PrismaService],
 })
 export class DatabaseModule {}

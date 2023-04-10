@@ -21,6 +21,7 @@ import * as Yaml from 'js-yaml'
 
 import { AppConfig } from '@_config/app.config'
 import { SwaggerConfig } from '@_config/swagger.config'
+import { PrismaService } from '@_database/prisma.service'
 import { ConfigName } from '@_enum/config'
 import { LogLevel } from '@_enum/log-level'
 
@@ -65,7 +66,9 @@ export async function getNestApp(): Promise<INestApplication> {
 
   const appConfig = _getConfig<AppConfig>(app, ConfigName.App)
 
-  app.enableShutdownHooks()
+  const prismaService = app.get(PrismaService)
+  await prismaService.enableShutdownHooks(app)
+
   app.useLogger(getLoggerLogLevel(appConfig))
   app.setGlobalPrefix(appConfig.apiPrefix)
   app.enableVersioning({
