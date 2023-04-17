@@ -2028,10 +2028,10 @@
   resolved "https://registry.yarnpkg.com/@nestjs/mapped-types/-/mapped-types-1.2.2.tgz#d9ddb143776e309dbc1a518ac1607fddac1e140e"
   integrity sha512-3dHxLXs3M0GPiriAcCFFJQHoDFUuzTD5w6JDhE7TyfT89YKpe6tcCCIqOZWdXmt9AZjjK30RkHRSFF+QEnWFQg==
 
-"@nestjs/mercurius@^11.0.3":
-  version "11.0.3"
-  resolved "https://registry.yarnpkg.com/@nestjs/mercurius/-/mercurius-11.0.3.tgz#44e4e4e7b5de15b69d29d64143e89aa69379900b"
-  integrity sha512-VuVcs2oFefvGsEi5lQBxT/vNbTPv0v6NZaVnvFaxP9IQFg07lNSONWWfTBI5ptvphftIqjAgPrMm2yYai/Af6g==
+"@nestjs/mercurius@^11.0.5":
+  version "11.0.5"
+  resolved "https://registry.yarnpkg.com/@nestjs/mercurius/-/mercurius-11.0.5.tgz#6c45d7d2a957fa7118a41ef3ff319a3515955afd"
+  integrity sha512-50U3MolmjN6CH7Z7jQDgP5NXtyNtpmYKLeUeqmRmON2Kf7NxcpO5RaEhums6E+X7i4q6QdNdSptbuiIsAENz6Q==
   dependencies:
     tslib "2.5.0"
 
