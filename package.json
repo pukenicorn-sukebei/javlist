@@ -41,7 +41,7 @@
     "@nestjs/bull": "^0.6.3",
     "@nestjs/common": "^9.4.0",
     "@nestjs/config": "^2.3.1",
-    "@nestjs/core": "^9.3.12",
+    "@nestjs/core": "^9.4.0",
     "@nestjs/graphql": "^11.0.4",
     "@nestjs/jwt": "^10.0.3",
     "@nestjs/mercurius": "^11.0.3",
