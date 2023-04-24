@@ -104,7 +104,7 @@
     "tsconfig-paths": "^4.2.0",
     "tsconfig-paths-jest": "^0.0.1",
     "tslib": "^2.5.0",
-    "typescript": "^5.0.3"
+    "typescript": "^5.0.4"
   },
   "engines": {
     "node": ">=14.0.0"
