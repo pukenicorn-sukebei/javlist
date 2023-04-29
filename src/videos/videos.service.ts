@@ -1,6 +1,5 @@
 import { InjectQueue } from '@nestjs/bull'
 import {
-  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -15,8 +14,12 @@ import { PrismaService } from '@_database/prisma.service'
 import { QueueName } from '@_enum/queue'
 import { Logger } from '@_logger'
 import { stringifyAliases } from '@_utils/alias'
-import { paginationToPrismaArgs } from '@_utils/infinity-pagination'
+import { PaginationDto } from '@_utils/dto/pagination.dto'
 import * as NormalizerUtils from '@_utils/normalizer'
+import {
+  paginationOptionsToPrismaPaginationArgs,
+  paginationOptionsToPrismaSortByArgs,
+} from '@_utils/pagination-options'
 import { IPaginationOptions } from '@_utils/types/pagination-options'
 
 import { FilesService } from '../files/files.service'
@@ -25,6 +28,8 @@ import { VideoDto, VideoWithInclude, VideosDefaultInclude } from './videos.dto'
 
 @Injectable()
 export class VideosService {
+  private static DEFAULT_ORDER = '-releaseDate'
+
   constructor(
     private readonly logger: Logger,
     private readonly prisma: PrismaService,
@@ -87,31 +92,35 @@ export class VideosService {
   }
 
   async findAll(
-    codes?: string[],
-    pagination: IPaginationOptions = {},
+    pagination: IPaginationOptions = new PaginationDto(),
   ): Promise<VideoWithInclude[]> {
-    if (codes?.length) {
-      if (pagination.page !== 1) {
-        throw new BadRequestException(
-          'Can not paginate when `codes` is present',
-        )
-      } else if (codes.length > pagination.amount!) {
-        throw new BadRequestException(
-          '`codes` can not be larger than page size',
-        )
-      }
-      codes = codes
-        .map(NormalizerUtils.normalizeCode)
-        .filter((x) => x) as string[]
-    }
+    return this.prisma.video.findMany({
+      include: VideosDefaultInclude,
+      ...paginationOptionsToPrismaPaginationArgs(pagination),
+      ...paginationOptionsToPrismaSortByArgs(
+        pagination,
+        VideosService.DEFAULT_ORDER,
+      ),
+    })
+  }
+
+  async findByCodes(
+    codes: string[],
+    pagination: IPaginationOptions = new PaginationDto(),
+  ): Promise<VideoWithInclude[]> {
+    codes = codes
+      .map(NormalizerUtils.normalizeCode)
+      .filter((x) => x) as string[]
 
     const videos = await this.prisma.video.findMany({
       include: VideosDefaultInclude,
       where: {
-        code: codes ? { in: codes } : undefined,
+        code: { in: codes },
       },
-      ...paginationToPrismaArgs(pagination),
-      orderBy: { releaseDate: 'desc' },
+      ...paginationOptionsToPrismaSortByArgs(
+        pagination,
+        VideosService.DEFAULT_ORDER,
+      ),
     })
 
     if (!codes?.length) {
@@ -136,7 +145,7 @@ export class VideosService {
 
   async findByTags(
     tags: string[],
-    pagination: IPaginationOptions = {},
+    pagination: IPaginationOptions = new PaginationDto(),
   ): Promise<VideoWithInclude[]> {
     return this.prisma.video.findMany({
       include: VideosDefaultInclude,
@@ -147,8 +156,11 @@ export class VideosService {
           },
         },
       },
-      ...paginationToPrismaArgs(pagination),
-      orderBy: { releaseDate: 'desc' },
+      ...paginationOptionsToPrismaPaginationArgs(pagination),
+      ...paginationOptionsToPrismaSortByArgs(
+        pagination,
+        VideosService.DEFAULT_ORDER,
+      ),
     })
   }
 

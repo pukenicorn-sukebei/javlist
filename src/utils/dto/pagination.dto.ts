@@ -1,9 +1,15 @@
 import { ExecutionContext, createParamDecorator } from '@nestjs/common'
-import { IsNumber, IsOptional, Max, Min } from 'class-validator'
+import { IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
 
 import { IPaginationOptions } from '@_utils/types/pagination-options'
 
 export class PaginationDto implements IPaginationOptions {
+  @IsOptional()
+  @IsString()
+  order?: string
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
   @IsNumber()
   page = 1
   @IsOptional()
