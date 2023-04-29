@@ -27,15 +27,19 @@ export class VideosController {
 
   @Get()
   async getVideos(
-    @Query('codes', new ParseArrayPipe(parseOptionalStringArrayOptions))
-    codes: string[] | undefined,
     @PaginationQuery()
     pagination: PaginationDto,
+    @Query('codes', new ParseArrayPipe(parseOptionalStringArrayOptions))
+    codes?: string[],
   ): Promise<VideoDto[]> {
-    return this.videosService
-      .findAll(codes, pagination)
-      .then((videos) =>
-        Promise.all(videos.map((video) => this.videosService.toDto(video))),
-      )
+    // noinspection ES6MissingAwait
+    const videosPromise =
+      codes && codes!.length !== 0
+        ? this.videosService.findByCodes(codes, pagination)
+        : this.videosService.findAll(pagination)
+
+    return videosPromise.then((videos) =>
+      Promise.all(videos.map((video) => this.videosService.toDto(video))),
+    )
   }
 }
