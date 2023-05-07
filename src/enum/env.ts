@@ -12,6 +12,15 @@ enum Cron {
   CleanUpOrphanAssets = 'CRON_CLEANUP_ORPHAN_ASSETS',
 }
 
+enum Db {
+  Type = 'DB_TYPE',
+  Username = 'DB_USERNAME',
+  Password = 'DB_PASSWORD',
+  Host = 'DB_HOST',
+  Port = 'DB_PORT',
+  Name = 'DB_NAME',
+}
+
 enum Feature {
   CrawlerQueue = 'ENABLE_CRAWLER_QUEUE',
 }
@@ -50,6 +59,7 @@ enum Swagger {
 
 export class Env {
   static readonly App = App
+  static readonly Db = Db
   static readonly Cron = Cron
   static readonly Feature = Feature
   static readonly PornScraper = PornScraper
