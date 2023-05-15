@@ -33,7 +33,7 @@
     "test:e2e": "env-cmd jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.315.0",
+    "@aws-sdk/client-s3": "^3.332.0",
     "@aws-sdk/s3-request-presigner": "^3.332.0",
     "@fastify/swagger": "^8.3.1",
     "@mercuriusjs/gateway": "^1.2.0",
