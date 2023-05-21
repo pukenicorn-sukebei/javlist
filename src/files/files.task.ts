@@ -5,7 +5,6 @@ import { SchedulerRegistry } from '@nestjs/schedule'
 import { BaseTask } from '@_base/base.task'
 import { CronConfig } from '@_config/cron.config'
 import { S3Config } from '@_config/s3.config'
-import { PrismaService } from '@_database/prisma.service'
 import { ConfigName } from '@_enum/config'
 import { Logger } from '@_logger'
 
@@ -17,7 +16,6 @@ export class FilesTask extends BaseTask {
 
   constructor(
     private readonly filesService: FilesService,
-    private readonly prisma: PrismaService,
     logger: Logger,
     schedulerRegistry: SchedulerRegistry,
     configService: ConfigService,
@@ -58,11 +56,11 @@ export class FilesTask extends BaseTask {
           bucket,
           this.s3Config.buckets.asset.keyPrefix,
         ),
-        this.prisma.file
-          .findMany({
-            where: { uploadedBucket: bucket },
-          })
-          .then((res) => res.forEach((f) => (fileRecords[f.uploadedPath] = 1))),
+        // this.prisma.file
+        //   .findMany({
+        //     where: { uploadedBucket: bucket },
+        //   })
+        //   .then((res) => res.forEach((f) => (fileRecords[f.uploadedPath] = 1))),
       ])
 
       this.logger.debug(

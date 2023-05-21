@@ -18,10 +18,10 @@ import Fastify from 'fastify'
 import { FastifyInstance } from 'fastify/types/instance'
 import * as Fs from 'fs'
 import * as Yaml from 'js-yaml'
+import { DataSource } from 'typeorm'
 
 import { AppConfig } from '@_config/app.config'
 import { SwaggerConfig } from '@_config/swagger.config'
-import { PrismaService } from '@_database/prisma.service'
 import { ConfigName } from '@_enum/config'
 import { LogLevel } from '@_enum/log-level'
 
@@ -33,6 +33,9 @@ DayJS.extend(DayJS_UTC)
 
 export async function runApp() {
   const app = await getNestApp()
+
+  const ds = app.get(DataSource)
+  console.log(ds)
 
   const appConfig = _getConfig<AppConfig>(app, ConfigName.App)
   await app.listen(appConfig.port, '0.0.0.0')
@@ -65,9 +68,6 @@ export async function getNestApp(): Promise<INestApplication> {
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
 
   const appConfig = _getConfig<AppConfig>(app, ConfigName.App)
-
-  const prismaService = app.get(PrismaService)
-  await prismaService.enableShutdownHooks(app)
 
   app.useLogger(getLoggerLogLevel(appConfig))
   app.setGlobalPrefix(appConfig.apiPrefix)

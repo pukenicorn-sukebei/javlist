@@ -2,95 +2,149 @@ import { faker as Faker } from '@faker-js/faker'
 import * as Path from 'path'
 
 import {
-  File,
-  FileType,
+  Asset,
+  Person,
   PersonAlias,
-  VideoKind,
+  Video,
   VideoLabel,
   VideoMaker,
   VideoTag,
-} from '@_generated/prisma'
+  VideoType,
+} from '@_models'
 
-import { PersonWithAliases } from '../../people/people.dto'
-import { VideoDto, VideoWithInclude } from '../../videos/videos.dto'
+import { VideoDto } from '../../videos/videos.dto'
 
-export function mockVideoMakerName(): string {
+function mockId() {
+  return { slug: Faker.lorem.slug(3) }
+}
+
+function mockSlug() {
+  return { id: Faker.datatype.uuid() }
+}
+
+function mockTimestamp() {
+  return {
+    createdAt: Faker.date.past(),
+    updatedAt: Faker.date.soon(),
+  }
+}
+
+function mockCommon() {
+  return {
+    ...mockId(),
+    ...mockSlug(),
+    ...mockTimestamp(),
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function videoMakerTitle(): string {
   return Faker.company.name()
 }
 
-export function mockVideoMaker(): VideoMaker {
-  return {
-    id: Faker.datatype.uuid(),
-    name: mockVideoMakerName(),
-    createdAt: Faker.date.past(),
-    updatedAt: Faker.date.soon(),
-  }
-}
-
-export function mockVideoLabelName(): string {
+function videoLabelTitle(): string {
   return Faker.company.catchPhrase()
 }
 
-export function mockVideoLabel(): VideoLabel {
-  return {
-    id: Faker.datatype.uuid(),
-    name: mockVideoLabelName(),
-    createdAt: Faker.date.past(),
-    updatedAt: Faker.date.soon(),
-  }
-}
-
-export function mockVideoTagName(): string {
+function videoTagTitle(): string {
   return Faker.commerce.productAdjective()
 }
 
-export function mockVideoTag(): VideoTag {
-  return {
-    id: Faker.datatype.uuid(),
-    name: mockVideoTagName(),
-  }
-}
-
-export function mockPersonAliasAlias(): string {
+function personAlias(): string {
   return Faker.name.fullName()
 }
 
-export function mockPersonAlias(): PersonAlias {
-  return {
+////////////////////////////////////////////////////////////////////////////////
+
+export function mockVideoMaker(opts: Partial<VideoMaker> = {}): VideoMaker {
+  const maker: VideoMaker = {
+    ...mockCommon(),
+    name: videoMakerTitle(),
+    videos: [],
+  }
+
+  maker.videos = opts.videos ?? [mockVideo({ maker })]
+
+  return maker
+}
+
+export function mockVideoLabel(opts: Partial<VideoLabel> = {}): VideoLabel {
+  const label: VideoLabel = {
+    ...mockCommon(),
+    name: videoLabelTitle(),
+    videos: [],
+  }
+
+  label.videos = opts.videos ?? [mockVideo({ label })]
+
+  return label
+}
+
+export function mockVideoTag(opts: Partial<VideoTag> = {}): VideoTag {
+  const tag: VideoTag = {
     id: Faker.datatype.uuid(),
-    personId: Faker.datatype.uuid(),
-    alias: mockPersonAliasAlias(),
+    name: videoTagTitle(),
+    slug: Faker.lorem.slug(3),
+    videos: [],
+  }
+
+  tag.videos = opts.videos ?? [mockVideo({ tags: [tag] })]
+
+  return tag
+}
+
+export function mockPersonAlias(opts: Partial<PersonAlias> = {}): PersonAlias {
+  return {
+    ...mockCommon(),
+    id: Faker.datatype.uuid(),
+    alias: personAlias(),
+    person: opts.person ?? mockPerson(),
   }
 }
 
-export function mockPersonWithAliases(): PersonWithAliases {
-  return {
-    id: Faker.datatype.uuid(),
-    aliases: [mockPersonAlias()],
-    createdAt: Faker.date.past(),
-    updatedAt: Faker.date.soon(),
+export function mockPerson(opts: Partial<Person> = {}): Person {
+  const person: Person = {
+    ...mockCommon(),
+    aliases: opts.aliases ?? [mockPersonAlias()],
+    alias: 'mock',
+    directed: [],
+    starred: [],
   }
+
+  person.directed = opts.directed ?? [mockVideo({ directors: [person] })]
+  person.starred = opts.starred ?? [mockVideo({ actors: [person] })]
+
+  return person
 }
 
-export function mockVideoWithInclude(): VideoWithInclude {
-  return {
-    id: Faker.datatype.uuid(),
-    kind: Faker.helpers.arrayElement(VideoKind[Symbol.iterator]),
+export function mockVideo(opts: Partial<Video> = {}): Video {
+  const video: Video = {
+    ...mockCommon(),
+    type: Faker.helpers.arrayElement(VideoType[Symbol.iterator]),
     code: Faker.hacker.abbreviation(),
-    name: Faker.commerce.productDescription(),
+    title: Faker.commerce.productDescription(),
     releaseDate: Faker.date.past(),
     length: Faker.datatype.number(),
-    coverPath: Faker.image.imageUrl(),
-    maker: mockVideoMaker(),
-    makerId: Faker.datatype.uuid(),
-    label: mockVideoLabel(),
-    labelId: Faker.datatype.uuid(),
-    tags: [mockVideoTag()],
-    directors: [mockPersonWithAliases()],
-    actors: [mockPersonWithAliases(), mockPersonWithAliases()],
-    createdAt: Faker.date.past(),
-    updatedAt: Faker.date.soon(),
+    // cover: Faker.image.imageUrl(),
+    samples: [],
+    maker: undefined,
+    label: undefined,
+    tags: [],
+    directors: [],
+    actors: [],
   }
+
+  video.maker = mockVideoMaker({ videos: [video] })
+  video.label = opts.label ?? mockVideoLabel({ videos: [video] })
+  video.tags = opts.tags ?? [mockVideoTag({ videos: [video] })]
+  video.directors = opts.directors ?? [mockPerson({ directed: [video] })]
+  video.actors = opts.actors ?? [
+    mockPerson({ starred: [video] }),
+    mockPerson({ starred: [video] }),
+  ]
+
+  return video
 }
 
 export function mockVideoDto(): VideoDto {
@@ -101,24 +155,23 @@ export function mockVideoDto(): VideoDto {
     releaseDate: Faker.date.past(),
     length: Faker.datatype.number(),
     coverUrl: Faker.image.imageUrl(),
-    maker: mockVideoMakerName(),
-    label: mockVideoLabelName(),
-    tags: [mockVideoTagName()],
-    directors: [mockPersonAliasAlias()],
-    actors: [mockPersonAliasAlias(), mockPersonAliasAlias()],
+    maker: videoMakerTitle(),
+    label: videoLabelTitle(),
+    tags: [videoTagTitle()],
+    directors: [personAlias()],
+    actors: [personAlias(), personAlias()],
   }
 }
 
 export function mockFile({
   uploadedPathPrefix,
-}: { uploadedPathPrefix?: string } = {}): File {
+}: { uploadedPathPrefix?: string } = {}): Asset {
   let uploadedPath = Faker.datatype.uuid() + '.jpg'
   if (uploadedPath) {
     uploadedPath = Path.posix.join(uploadedPathPrefix!, uploadedPath)
   }
   return {
     id: Faker.datatype.uuid(),
-    type: Faker.helpers.arrayElement(Object.values(FileType)),
     originalName: Faker.system.fileName(),
     originalPath: Faker.system.filePath(),
     uploadedPath,

@@ -6,25 +6,23 @@ import {
   Optional,
   RequestTimeoutException,
 } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
 import { Queue } from 'bull'
 import { Subscription } from 'rxjs'
+import { In, Repository } from 'typeorm'
 
 import { PornScraperService } from '@_clients/porn-scraper.service'
-import { PrismaService } from '@_database/prisma.service'
 import { QueueName } from '@_enum/queue'
 import { Logger } from '@_logger'
+import { Video } from '@_models'
 import { stringifyAliases } from '@_utils/alias'
 import { PaginationDto } from '@_utils/dto/pagination.dto'
 import * as NormalizerUtils from '@_utils/normalizer'
-import {
-  paginationOptionsToPrismaPaginationArgs,
-  paginationOptionsToPrismaSortByArgs,
-} from '@_utils/pagination-options'
 import { IPaginationOptions } from '@_utils/types/pagination-options'
 
 import { FilesService } from '../files/files.service'
 import { PornScraperJobRequest, VideosConsumer } from './videos.consumer'
-import { VideoDto, VideoWithInclude, VideosDefaultInclude } from './videos.dto'
+import { VideoDto } from './videos.dto'
 
 @Injectable()
 export class VideosService {
@@ -32,10 +30,11 @@ export class VideosService {
 
   constructor(
     private readonly logger: Logger,
-    private readonly prisma: PrismaService,
     private readonly pornScraperService: PornScraperService,
     private readonly filesService: FilesService,
     private readonly videosConsumer: VideosConsumer,
+    @InjectRepository(Video)
+    private readonly videosRepository: Repository<Video>,
     @InjectQueue(QueueName.PornScraper)
     @Optional()
     private readonly pornScraperQueue?: Queue<PornScraperJobRequest>,
@@ -43,17 +42,22 @@ export class VideosService {
     logger.setContext(VideosService.name)
   }
 
-  async toDto(video: VideoWithInclude): Promise<VideoDto> {
-    const [coverUrl] = await Promise.all([
-      this.filesService.getAssetPreSignedUrl(video.coverPath),
-    ])
+  async toDto(video: Video): Promise<VideoDto> {
+    const [coverUrl] = video.cover
+      ? await Promise.all([
+          this.filesService.getPreSignedUrl(
+            video.cover.uploadedBucket,
+            video.cover.uploadedPath,
+          ),
+        ])
+      : [null]
 
     return {
       id: video.id,
       code: video.code,
-      name: video.name,
+      name: video.title,
       releaseDate: video.releaseDate,
-      length: video.length,
+      length: video.length || null,
       // createdAt: video.createdAt,
       // updatedAt: video.updatedAt,
       coverUrl,
@@ -69,17 +73,18 @@ export class VideosService {
     }
   }
 
-  async findByCode(
-    code: string,
-    { forceUpdate = false } = {},
-  ): Promise<VideoWithInclude> {
+  async findByCode(code: string, { forceUpdate = false } = {}): Promise<Video> {
     const normalizedCode = NormalizerUtils.normalizeCode(code)
     if (!normalizedCode) throw new NotFoundException('Invalid code')
 
-    const video = await this.prisma.video.findUnique({
-      include: VideosDefaultInclude,
-      where: { code: normalizedCode },
+    const video = await this.videosRepository.findOneBy({
+      code: normalizedCode,
     })
+    // const video = await this.prisma.video.findUnique({
+    //   include: VideosDefaultInclude,
+    //   where: { code: normalizedCode },
+    // })
+
     if (!forceUpdate && video) {
       return video
     }
@@ -93,35 +98,42 @@ export class VideosService {
 
   async findAll(
     pagination: IPaginationOptions = new PaginationDto(),
-  ): Promise<VideoWithInclude[]> {
-    return this.prisma.video.findMany({
-      include: VideosDefaultInclude,
-      ...paginationOptionsToPrismaPaginationArgs(pagination),
-      ...paginationOptionsToPrismaSortByArgs(
-        pagination,
-        VideosService.DEFAULT_ORDER,
-      ),
-    })
+  ): Promise<Video[]> {
+    return this.videosRepository.find()
+    // return this.prisma.video.findMany({
+    //   include: VideosDefaultInclude,
+    //   ...paginationOptionsToPrismaPaginationArgs(pagination),
+    //   ...paginationOptionsToPrismaSortByArgs(
+    //     pagination,
+    //     VideosService.DEFAULT_ORDER,
+    //   ),
+    // })
   }
 
   async findByCodes(
     codes: string[],
     pagination: IPaginationOptions = new PaginationDto(),
-  ): Promise<VideoWithInclude[]> {
+  ): Promise<Video[]> {
     codes = codes
       .map(NormalizerUtils.normalizeCode)
       .filter((x) => x) as string[]
 
-    const videos = await this.prisma.video.findMany({
-      include: VideosDefaultInclude,
+    const videos = await this.videosRepository.find({
       where: {
-        code: { in: codes },
+        code: In(codes),
       },
-      ...paginationOptionsToPrismaSortByArgs(
-        pagination,
-        VideosService.DEFAULT_ORDER,
-      ),
     })
+
+    // const videos = await this.prisma.video.findMany({
+    //   include: VideosDefaultInclude,
+    //   where: {
+    //     code: { in: codes },
+    //   },
+    //   ...paginationOptionsToPrismaSortByArgs(
+    //     pagination,
+    //     VideosService.DEFAULT_ORDER,
+    //   ),
+    // })
 
     if (!codes?.length) {
       this.logger.verbose(`[findAll] no codes specified, skipping fetch`)
@@ -146,25 +158,30 @@ export class VideosService {
   async findByTags(
     tags: string[],
     pagination: IPaginationOptions = new PaginationDto(),
-  ): Promise<VideoWithInclude[]> {
-    return this.prisma.video.findMany({
-      include: VideosDefaultInclude,
+  ): Promise<Video[]> {
+    return this.videosRepository.find({
       where: {
-        tags: {
-          every: {
-            name: { in: tags },
-          },
-        },
+        tags: { slug: In(tags) },
       },
-      ...paginationOptionsToPrismaPaginationArgs(pagination),
-      ...paginationOptionsToPrismaSortByArgs(
-        pagination,
-        VideosService.DEFAULT_ORDER,
-      ),
     })
+    // return this.prisma.video.findMany({
+    //   include: VideosDefaultInclude,
+    //   where: {
+    //     tags: {
+    //       every: {
+    //         name: { in: tags },
+    //       },
+    //     },
+    //   },
+    //   ...paginationOptionsToPrismaPaginationArgs(pagination),
+    //   ...paginationOptionsToPrismaSortByArgs(
+    //     pagination,
+    //     VideosService.DEFAULT_ORDER,
+    //   ),
+    // })
   }
 
-  private async _fetchFromScraper(code: string): Promise<VideoWithInclude> {
+  private async _fetchFromScraper(code: string): Promise<Video> {
     if (this.pornScraperQueue) {
       this.logger.debug(`[${code}]: fetch with queue`)
       return this._fetchFromScraperWithQueue(code)
@@ -174,34 +191,33 @@ export class VideosService {
     }
   }
 
-  private async _fetchFromScraperWithQueue(
-    code: string,
-  ): Promise<VideoWithInclude> {
-    // TODO might need to normalize code for job id
+  private async _fetchFromScraperWithQueue(code: string): Promise<Video> {
+    const normalizedCode = NormalizerUtils.normalizeCode(code)
+    if (!normalizedCode) throw new NotFoundException('Invalid code')
 
     let subscription: Subscription
-    const resultPromise = new Promise<VideoWithInclude>((resolve, reject) => {
+    const resultPromise = new Promise<Video>((resolve, reject) => {
       const timerId = setTimeout(() => {
-        this.logger.error(`[${code}][Queue]: Request timed out`)
+        this.logger.error(`[${normalizedCode}][Queue]: Request timed out`)
         reject(new RequestTimeoutException())
       }, 20000)
       subscription = this.videosConsumer.subscribeObservable({
         next: (result) => {
-          if (result.code === code) {
+          if (result.code === normalizedCode) {
             clearTimeout(timerId)
             if (result.data) {
               this.logger.verbose(
-                `[${code}][Queue]: Resolved with ${result.data}`,
+                `[${normalizedCode}][Queue]: Resolved with ${result.data}`,
               )
               resolve(result.data)
             } else if (result.err) {
               this.logger.error(
-                `[${code}][Queue]: Resolved to error: ${result.err}`,
+                `[${normalizedCode}][Queue]: Resolved to error: ${result.err}`,
               )
               reject(result.err)
             } else {
               this.logger.error(
-                `[${code}][Queue]: Probably canceled; ${JSON.stringify(
+                `[${normalizedCode}][Queue]: Probably canceled; ${JSON.stringify(
                   result,
                 )}`,
               )
@@ -210,11 +226,15 @@ export class VideosService {
           }
         },
         error: (err) => {
-          this.logger.error(`[${code}][Queue]: Returned error: ${err}`)
+          this.logger.error(
+            `[${normalizedCode}][Queue]: Returned error: ${err}`,
+          )
           reject(err)
         },
         complete: () => {
-          this.logger.error(`[${code}][Queue]: Something must have went wrong`)
+          this.logger.error(
+            `[${normalizedCode}][Queue]: Something must have went wrong`,
+          )
           reject(
             new InternalServerErrorException('Something must have went wrong'),
           )
@@ -225,7 +245,10 @@ export class VideosService {
       subscription?.unsubscribe()
     })
 
-    await this.pornScraperQueue!.add({ code }, { jobId: code })
+    await this.pornScraperQueue!.add(
+      { code: normalizedCode },
+      { jobId: normalizedCode },
+    )
 
     return resultPromise
   }

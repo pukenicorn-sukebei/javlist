@@ -1,10 +1,7 @@
 import { DeepMockProxy } from 'jest-mock-extended'
 
 import { createTestingModule } from '@_utils/testing/module'
-import {
-  mockVideoDto,
-  mockVideoWithInclude,
-} from '@_utils/testing/value-mocker'
+import { mockVideo, mockVideoDto } from '@_utils/testing/value-mocker'
 
 import { VideosController } from './videos.controller'
 import { VideosService } from './videos.service'
@@ -33,11 +30,11 @@ describe('VideosController', () => {
   describe('/:code', () => {
     it('should return correct value', async () => {
       const id = 'test'
-      const video = mockVideoWithInclude()
+      const video = mockVideo()
       const videoDto = mockVideoDto()
 
       service.findByCode.mockImplementation((x) =>
-        Promise.resolve(x === id ? video : mockVideoWithInclude()),
+        Promise.resolve(x === id ? video : mockVideo()),
       )
       service.toDto.mockImplementation((x) =>
         Promise.resolve(x.id === video.id ? videoDto : mockVideoDto()),

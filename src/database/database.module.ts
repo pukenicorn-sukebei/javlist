@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { BaseEntity } from 'typeorm'
 
-import { PrismaService } from '@_database/prisma.service'
+import * as Models from '@_models'
 
 @Module({
-  providers: [PrismaService],
-  exports: [PrismaService],
+  imports: [TypeOrmModule.forFeature(Object.values(Models) as any[])],
+  exports: [TypeOrmModule],
 })
 export class DatabaseModule {}

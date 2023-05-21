@@ -4,7 +4,6 @@ import { Queue } from 'bull'
 import { mockDeep } from 'jest-mock-extended'
 
 import { PornScraperService } from '@_clients/porn-scraper.service'
-import { PrismaService } from '@_database/prisma.service'
 import { QueueName } from '@_enum/queue'
 import { Logger } from '@_logger'
 
@@ -26,7 +25,5 @@ export const mockFactory: MockFactory = (token) => {
       return mockDeep<FilesService>()
     case getQueueToken(QueueName.PornScraper):
       return mockDeep<Queue>()
-    case PrismaService:
-      return mockDeep<PrismaService>()
   }
 }

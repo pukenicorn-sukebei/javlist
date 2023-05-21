@@ -15,16 +15,19 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { InjectRepository } from '@nestjs/typeorm'
 import { Cache } from 'cache-manager'
 import * as Path from 'path'
+import { Repository } from 'typeorm'
 import * as UUID from 'uuid'
 
 import { S3Config } from '@_config/s3.config'
-import { PrismaService } from '@_database/prisma.service'
 import { ConfigName } from '@_enum/config'
-import { File, FileType, Prisma } from '@_generated/prisma'
 import { Logger } from '@_logger'
+import { Asset, VideoCover, VideoSample } from '@_models'
 import * as UrlUtils from '@_utils/url'
+
+import { FileType } from './file-type.enum'
 
 export interface IFileUploadMeta {
   originalName?: string
@@ -41,8 +44,14 @@ export class FilesService {
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     private readonly httpService: HttpService,
-    private readonly prisma: PrismaService,
     private readonly s3Client: S3Client,
+    // Repositories
+    @InjectRepository(Asset)
+    private readonly filesRepository: Repository<Asset>,
+    @InjectRepository(VideoCover)
+    private readonly videoCoversRepository: Repository<VideoCover>,
+    @InjectRepository(VideoSample)
+    private readonly videoSamplesRepository: Repository<VideoSample>,
     configService: ConfigService,
   ) {
     this.logger.setContext(this.constructor.name)
@@ -58,7 +67,19 @@ export class FilesService {
     }
   }
 
-  async uploadAssetFromUrl(type: FileType, url: string): Promise<File> {
+  private getRepository<E extends Asset>(type: FileType): Repository<E> {
+    switch (type) {
+      // TODO impl
+      // case FileType.VideoCover:
+      //   return this.videoCoversRepository
+      // case FileType.VideoSample:
+      //   return this.videoSamplesRepository
+      default:
+        throw new Error(`Invalid FileType (got ${type})`)
+    }
+  }
+
+  async uploadAssetFromUrl(type: FileType, url: string): Promise<Asset> {
     return this.uploadFromUrl(
       type,
       this.s3Config.buckets.asset.name!,
@@ -67,16 +88,12 @@ export class FilesService {
     )
   }
 
-  async getAssetPreSignedUrl(key: string, age?: number): Promise<string> {
-    return this.getPreSignedUrl(this.s3Config.buckets.asset.name!, key, age)
-  }
-
   async uploadFromUrl(
     type: FileType,
     bucket: string,
     keyPrefix: string,
     url: string,
-  ): Promise<File> {
+  ): Promise<Asset> {
     const data = await this.httpService.axiosRef
       .get(url, { responseType: 'arraybuffer' })
       .then((response) => Buffer.from(response.data, 'binary'))
@@ -97,7 +114,7 @@ export class FilesService {
     key: string,
     data: PutObjectRequest['Body'] | string | Uint8Array | Buffer,
     { originalName, originalPath }: IFileUploadMeta = {},
-  ): Promise<File> {
+  ): Promise<Asset> {
     this.logger.verbose(`[Upload][${bucket}:${key}] Uploading`)
 
     await this.s3Client
@@ -108,22 +125,23 @@ export class FilesService {
         throw err
       })
 
-    const params: Prisma.XOR<
-      Prisma.FileCreateInput,
-      Prisma.FileUncheckedCreateInput
-    > = {
-      type,
-      originalName,
-      originalPath,
-      uploadedBucket: bucket,
-      uploadedPath: key,
-    }
-
-    const fileRecordPromise = this.prisma.file.upsert({
-      where: { type_uploadedPath: { type, uploadedPath: key } },
-      create: params,
-      update: params,
-    })
+    const fileRecordPromise = this.filesRepository.upsert(
+      {
+        originalName,
+        originalPath,
+        uploadedBucket: bucket,
+        uploadedPath: key,
+      },
+      {
+        skipUpdateIfNoValuesChanged: true,
+        conflictPaths: {
+          originalName: true,
+          originalPath: true,
+          uploadedBucket: true,
+          uploadedPath: true,
+        },
+      },
+    )
 
     fileRecordPromise.catch((err) =>
       this.logger.error(
@@ -131,7 +149,7 @@ export class FilesService {
       ),
     )
 
-    return fileRecordPromise
+    return fileRecordPromise.then((res) => res.raw[0])
   }
 
   async getPreSignedUrl(
@@ -204,8 +222,8 @@ export class FilesService {
         this.logger.error(`[Delete][${bucket}:${key}] Failed: ${err}`),
       )
 
-    await this.prisma.file
-      .delete({ where: { uploadedPath: key } })
+    await this.filesRepository
+      .delete({ uploadedPath: key })
       .catch((err) =>
         this.logger.error(
           `[Delete][${bucket}:${key}] Failed to remove from db ${err}`,

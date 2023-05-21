@@ -4,12 +4,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { GraphQLModule } from '@nestjs/graphql'
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius'
 import { ScheduleModule } from '@nestjs/schedule'
+import { TypeOrmModule } from '@nestjs/typeorm'
 import { instanceToPlain } from 'class-transformer'
 
 import { BullConfigService } from '@_config-services/bull-config.service'
 import { GraphqlConfigService } from '@_config-services/graphql-config.service'
+import { TypeOrmConfigService } from '@_config-services/typeorm-config.service'
 import Configs from '@_config/index'
-import { DatabaseModule } from '@_database/database.module'
 import { ConfigName } from '@_enum/config'
 import { Logger } from '@_logger'
 
@@ -30,13 +31,16 @@ import { VideosService } from './videos/videos.service'
     BullModule.forRootAsync({
       useClass: BullConfigService,
     }),
-    VideosModule.register(),
-    GraphQLModule.forRootAsync<MercuriusDriverConfig>({
-      driver: MercuriusDriver,
-      imports: [DatabaseModule, FilesModule, VideosModule.register()],
-      useClass: GraphqlConfigService,
-      inject: [VideosService],
+    TypeOrmModule.forRootAsync({
+      useClass: TypeOrmConfigService,
     }),
+    VideosModule.register(),
+    // GraphQLModule.forRootAsync<MercuriusDriverConfig>({
+    //   driver: MercuriusDriver,
+    //   imports: [FilesModule, VideosModule.register()],
+    //   useClass: GraphqlConfigService,
+    //   inject: [VideosService],
+    // }),
   ],
 })
 export class AppModule implements OnModuleInit {

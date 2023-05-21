@@ -16,15 +16,15 @@ export class DbConfig {
   name: string
 }
 
-export default registerAs<DbConfig>(
-  ConfigName.Db,
-  () =>
-    new DbConfig({
-      type: process.env[Env.Db.Type]!,
-      username: process.env[Env.Db.Username]!,
-      password: process.env[Env.Db.Password]!,
-      host: process.env[Env.Db.Host]!,
-      port: +process.env[Env.Db.Port]!,
-      name: process.env[Env.Db.Name]!,
-    }),
-)
+export function getDbConfig() {
+  return new DbConfig({
+    type: process.env[Env.Db.Type]!,
+    username: process.env[Env.Db.Username]!,
+    password: process.env[Env.Db.Password]!,
+    host: process.env[Env.Db.Host]!,
+    port: +process.env[Env.Db.Port]!,
+    name: process.env[Env.Db.Name]!,
+  })
+}
+
+export default registerAs<DbConfig>(ConfigName.Db, getDbConfig)
