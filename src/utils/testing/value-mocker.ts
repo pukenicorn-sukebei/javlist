@@ -58,11 +58,11 @@ function personAlias(): string {
 ////////////////////////////////////////////////////////////////////////////////
 
 export function mockVideoMaker(opts: Partial<VideoMaker> = {}): VideoMaker {
-  const maker: VideoMaker = {
+  const maker = new VideoMaker({
     ...mockCommon(),
     name: videoMakerTitle(),
     videos: [],
-  }
+  })
 
   maker.videos = opts.videos ?? [mockVideo({ maker })]
 
@@ -70,11 +70,11 @@ export function mockVideoMaker(opts: Partial<VideoMaker> = {}): VideoMaker {
 }
 
 export function mockVideoLabel(opts: Partial<VideoLabel> = {}): VideoLabel {
-  const label: VideoLabel = {
+  const label = new VideoLabel({
     ...mockCommon(),
     name: videoLabelTitle(),
     videos: [],
-  }
+  })
 
   label.videos = opts.videos ?? [mockVideo({ label })]
 
@@ -82,12 +82,12 @@ export function mockVideoLabel(opts: Partial<VideoLabel> = {}): VideoLabel {
 }
 
 export function mockVideoTag(opts: Partial<VideoTag> = {}): VideoTag {
-  const tag: VideoTag = {
+  const tag = new VideoTag({
     id: Faker.datatype.uuid(),
     name: videoTagTitle(),
     slug: Faker.lorem.slug(3),
     videos: [],
-  }
+  })
 
   tag.videos = opts.videos ?? [mockVideo({ tags: [tag] })]
 
@@ -95,22 +95,22 @@ export function mockVideoTag(opts: Partial<VideoTag> = {}): VideoTag {
 }
 
 export function mockPersonAlias(opts: Partial<PersonAlias> = {}): PersonAlias {
-  return {
+  return new PersonAlias({
     ...mockCommon(),
     id: Faker.datatype.uuid(),
     alias: personAlias(),
     person: opts.person ?? mockPerson(),
-  }
+  })
 }
 
 export function mockPerson(opts: Partial<Person> = {}): Person {
-  const person: Person = {
+  const person = new Person({
     ...mockCommon(),
     aliases: opts.aliases ?? [mockPersonAlias()],
     alias: 'mock',
     directed: [],
     starred: [],
-  }
+  })
 
   person.directed = opts.directed ?? [mockVideo({ directors: [person] })]
   person.starred = opts.starred ?? [mockVideo({ actors: [person] })]
@@ -119,7 +119,7 @@ export function mockPerson(opts: Partial<Person> = {}): Person {
 }
 
 export function mockVideo(opts: Partial<Video> = {}): Video {
-  const video: Video = {
+  const video = new Video({
     ...mockCommon(),
     type: Faker.helpers.arrayElement(VideoType[Symbol.iterator]),
     code: Faker.hacker.abbreviation(),
@@ -133,7 +133,7 @@ export function mockVideo(opts: Partial<Video> = {}): Video {
     tags: [],
     directors: [],
     actors: [],
-  }
+  })
 
   video.maker = mockVideoMaker({ videos: [video] })
   video.label = opts.label ?? mockVideoLabel({ videos: [video] })
@@ -155,6 +155,7 @@ export function mockVideoDto(): VideoDto {
     releaseDate: Faker.date.past(),
     length: Faker.datatype.number(),
     coverUrl: Faker.image.imageUrl(),
+    sampleUrls: [Faker.image.imageUrl()],
     maker: videoMakerTitle(),
     label: videoLabelTitle(),
     tags: [videoTagTitle()],
@@ -171,6 +172,7 @@ export function mockFile({
     uploadedPath = Path.posix.join(uploadedPathPrefix!, uploadedPath)
   }
   return {
+    type: '', // TODO impl
     id: Faker.datatype.uuid(),
     originalName: Faker.system.fileName(),
     originalPath: Faker.system.filePath(),

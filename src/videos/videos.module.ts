@@ -11,6 +11,7 @@ import { FilesModule } from '../files/files.module'
 import { PeopleModule } from '../people/people.module'
 import { VideosConsumer } from './videos.consumer'
 import { VideosController } from './videos.controller'
+import { VideosRepository } from './videos.repository'
 import { VideosService } from './videos.service'
 
 interface VideosModuleOptions {
@@ -41,8 +42,8 @@ export class VideosModule {
     const module: ModuleMetadata = {
       imports: [DatabaseModule, PornScraperModule, FilesModule, PeopleModule],
       controllers: [VideosController],
-      providers: [VideosService, VideosConsumer],
-      exports: [VideosService],
+      providers: [VideosService, VideosRepository, VideosConsumer],
+      exports: [VideosService, VideosRepository],
     }
 
     if (enableScraperQueue) {

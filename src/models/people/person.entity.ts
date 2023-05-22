@@ -6,6 +6,11 @@ import { PersonAlias } from './person-alias.entity'
 
 @Entity()
 export class Person extends BaseEntityWithTimestamps {
+  constructor(data: Partial<Person> = {}) {
+    super()
+    Object.assign(this, data)
+  }
+
   @OneToMany(() => PersonAlias, (personAlias) => personAlias.person, {
     eager: true,
     cascade: true,

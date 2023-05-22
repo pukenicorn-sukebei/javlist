@@ -28,9 +28,9 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
     return {
       logger: this.logger,
       namingStrategy: new SnakeNamingStrategy(),
-      entities: ['**/*.entity.ts'],
+      entities: [Path.join(process.cwd(), '**', '*.entity.{ts|js}')],
       subscribers: [],
-      // autoLoadEntities: true,
+      autoLoadEntities: true,
       // subscribers: [],
     }
   }
@@ -66,7 +66,10 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       username: this.dbConfig.username,
       password: this.dbConfig.password,
       database: this.dbConfig.name,
-      migrations: [Path.join(process.cwd(), 'migrations', '*.ts')],
+      migrations:
+        this.appConfig.appEnv === 'typeorm-cli'
+          ? [Path.join(process.cwd(), 'migrations', '*.ts')]
+          : undefined,
       namingStrategy: new SnakeNamingStrategy(),
       logger: this.logger,
     }

@@ -14,20 +14,20 @@ import {
   Process,
   Processor,
 } from '@nestjs/bull'
-import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { Job } from 'bull'
 import * as DayJS from 'dayjs'
 import { Observer, Subject, Subscription, noop } from 'rxjs'
-import { Repository } from 'typeorm'
 
 import { PornScraperService } from '@_clients/porn-scraper.service'
 import { QueueName } from '@_enum/queue'
 import { Logger } from '@_logger'
-import { Video } from '@_models'
+import { Video, VideoCover, VideoSample, VideoType } from '@_models'
 
+import { FileType } from '../files/file-type.enum'
 import { FilesService } from '../files/files.service'
 import { PeopleService } from '../people/people.service'
+import { VideosRepository } from './videos.repository'
 
 export interface PornScraperJobRequest {
   code: string
@@ -49,8 +49,7 @@ export class VideosConsumer {
 
   constructor(
     private readonly logger: Logger,
-    @InjectRepository(Video)
-    private readonly videosRepository: Repository<Video>,
+    private readonly videoRepository: VideosRepository,
     private readonly pornScraperService: PornScraperService,
     private readonly filesService: FilesService,
     private readonly peopleService: PeopleService,
@@ -67,83 +66,100 @@ export class VideosConsumer {
 
   @Process()
   public async processQueue(job: PornScraperJob): Promise<Video> {
-    // noinspection UnnecessaryLocalVariableJS
-    const video = await this.fetchVideoFromScraper(job.data.code, job)
-
-    return video
+    return this.fetchVideoFromScraper(job.data.code, job)
   }
 
   public async fetchVideoFromScraper(
     code: string,
     job?: PornScraperJob,
   ): Promise<Video> {
-    return {} as any
-    // const scraperResult = await this.pornScraperService.getByCode(code)
-    //
-    // job?.progress(20).catch(noop)
-    //
-    // const data = scraperResult.data
-    //
-    // const releaseDate = data.release_date
-    //   ? DayJS.utc(data.release_date).toDate()
-    //   : undefined
-    //
-    //
-    // const actorsPromise = this.peopleService.find(data.actresses)
-    // const coverPromise = this.filesService.uploadAssetFromUrl(
-    //   FileType.VideoCover,
-    //   data.image,
-    // )
-    //
-    // ;[actorsPromise, coverPromise].map((promise) =>
-    //   promise.then(() => job?.progress(job?.progress() + 20)),
-    // )
-    //
-    // const actors = await actorsPromise
-    // const cover = await coverPromise
-    //
-    // const params: Prisma.XOR<
-    //   Prisma.VideoCreateInput,
-    //   Prisma.VideoUncheckedCreateInput
-    // > = {
-    //   code: data.code.trim(),
-    //   name: data.name.trim(),
-    //   // TODO get kind from from response
-    //   kind: VideoType.Jav,
-    //   releaseDate,
-    //   coverPath: cover.uploadedPath,
-    //   length: 0,
-    //   label: {
-    //     connectOrCreate: {
-    //       create: { name: 'placeholder' },
-    //       where: { name: 'placeholder' },
-    //     },
-    //   },
-    //   maker: {
-    //     connectOrCreate: {
-    //       create: { name: data.studio.trim() },
-    //       where: { name: data.studio.trim() },
-    //     },
-    //   },
-    //   actors: {
-    //     connect: actors.map((actor) => ({ id: actor.id })),
-    //   },
-    //   tags: {
-    //     connectOrCreate: data.genres.map((tag) => ({
-    //       create: { name: tag.trim() },
-    //       where: { name: tag.trim() },
-    //     })),
-    //   },
-    // }
-    //
-    // job?.progress(80).catch(noop)
-    //
-    // return this.prisma.video.upsert({
-    //   include: VideosDefaultInclude,
-    //   where: { code: data.code.trim() },
-    //   create: params,
-    //   update: params,
-    // })
+    const scraperResult = await this.pornScraperService.getByCode(code)
+
+    job?.progress(20).catch(noop)
+
+    const data = scraperResult.data
+
+    const releaseDate = data.release_date
+      ? DayJS.utc(data.release_date).toDate()
+      : undefined
+
+    const actorsPromise = this.peopleService.findMany(data.actors, {
+      createOnNotFound: true,
+    })
+    const directorsPromise = this.peopleService.findMany(data.directors, {
+      createOnNotFound: true,
+    })
+
+    const coverPromise = data.cover_url
+      ? this.filesService
+          .uploadAssetFromUrl(FileType.VideoCover, data.cover_url)
+          .then((x) => x as VideoCover)
+      : undefined
+
+    const samplesPromise = Promise.all(
+      data.sample_image_urls.map((sample) =>
+        this.filesService
+          .uploadAssetFromUrl(FileType.VideoSample, sample)
+          .then((x) => x as VideoSample),
+      ),
+    )
+
+    const tagsPromise = this.videoRepository.findManyTags(data.tags, {
+      createOnNotFound: true,
+    })
+
+    // noinspection ES6MissingAwait
+    const makerPromise = data.maker
+      ? this.videoRepository.findMaker(data.maker, { createOnNotFound: true })
+      : undefined
+
+    // noinspection ES6MissingAwait
+    const labelPromise = data.label
+      ? this.videoRepository.findLabel(data.label, { createOnNotFound: true })
+      : undefined
+
+    const allPromises = [
+      actorsPromise,
+      directorsPromise,
+      coverPromise,
+      samplesPromise,
+      tagsPromise,
+      makerPromise,
+      labelPromise,
+    ].filter((x) => x) as Promise<unknown>[]
+
+    allPromises.map((promise) =>
+      promise.then(() =>
+        job?.progress(job?.progress() + 60 / allPromises.length),
+      ),
+    )
+
+    await Promise.all(allPromises)
+
+    const video = await this.videoRepository.findByCode(data.code, {
+      loadRelation: true,
+      initOnNotFound: true,
+    })
+
+    if (!video) {
+      throw new InternalServerErrorException(
+        'Somehow `video` does not get create',
+      )
+    }
+    video.type = VideoType.Jav
+    video.code = data.code.toUpperCase()
+    video.title = data.name ?? undefined
+    video.releaseDate = releaseDate ?? undefined
+    video.cover = (await coverPromise) ?? undefined
+    video.samples = await samplesPromise
+    video.length = data.length ?? undefined
+    video.actors = await actorsPromise
+    video.tags = await tagsPromise
+    video.maker = (await makerPromise) ?? undefined
+    video.label = (await labelPromise) ?? undefined
+
+    const x = await this.videoRepository.save(video)
+    return x
   }
 
   //////////////////////////////////////////////////////////////////////////////

@@ -4,11 +4,11 @@ export function parseTruthyFalsyString(value: string | undefined): boolean {
     case 'undefined':
     case null:
     case 'null':
-    case '':
     case '0':
     case 'false':
     case 'NaN':
       return false
+    case '':
     default:
       return true
   }

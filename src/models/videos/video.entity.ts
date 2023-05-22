@@ -22,6 +22,11 @@ export enum VideoType {
 
 @Entity()
 export class Video extends BaseEntityWithTimestamps {
+  constructor(data: Partial<Video> = {}) {
+    super()
+    Object.assign(this, data)
+  }
+
   @Column()
   type: VideoType
 
@@ -37,25 +42,31 @@ export class Video extends BaseEntityWithTimestamps {
   @Column({ nullable: true })
   length?: number
 
-  @ManyToMany(() => Person, (person) => person.directed)
+  @ManyToMany(() => Person, (person) => person.directed, { eager: true })
   directors: Person[]
 
-  @ManyToMany(() => Person, (person) => person.starred)
+  @ManyToMany(() => Person, (person) => person.starred, { eager: true })
   actors: Person[]
 
-  @ManyToMany(() => VideoTag)
+  @ManyToMany(() => VideoTag, { eager: true })
   @JoinTable()
   tags: VideoTag[]
 
-  @ManyToOne(() => VideoLabel, (label) => label.videos)
+  @ManyToOne(() => VideoLabel, (label) => label.videos, { eager: true })
   label?: VideoLabel
 
-  @ManyToOne(() => VideoMaker, (maker) => maker.videos)
+  @ManyToOne(() => VideoMaker, (maker) => maker.videos, { eager: true })
   maker?: VideoMaker
 
-  @OneToOne(() => VideoCover, (videoCover) => videoCover.video)
+  @OneToOne(() => VideoCover, (videoCover) => videoCover.video, {
+    cascade: true,
+    eager: true,
+  })
   cover?: VideoCover
 
-  @OneToMany(() => VideoSample, (videoSample) => videoSample.video)
-  samples: VideoCover[]
+  @OneToMany(() => VideoSample, (videoSample) => videoSample.video, {
+    cascade: true,
+    eager: true,
+  })
+  samples: VideoSample[]
 }

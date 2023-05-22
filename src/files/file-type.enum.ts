@@ -1,4 +1,5 @@
 export enum FileType {
-  VideoCover,
-  VideoSample,
+  Asset = 'asset',
+  VideoCover = 'video-cover',
+  VideoSample = 'video-sample',
 }

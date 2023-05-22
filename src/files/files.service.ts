@@ -15,19 +15,18 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { InjectRepository } from '@nestjs/typeorm'
 import { Cache } from 'cache-manager'
 import * as Path from 'path'
-import { Repository } from 'typeorm'
 import * as UUID from 'uuid'
 
 import { S3Config } from '@_config/s3.config'
 import { ConfigName } from '@_enum/config'
 import { Logger } from '@_logger'
-import { Asset, VideoCover, VideoSample } from '@_models'
+import { Asset } from '@_models'
 import * as UrlUtils from '@_utils/url'
 
 import { FileType } from './file-type.enum'
+import { FilesRepository } from './files.repository'
 
 export interface IFileUploadMeta {
   originalName?: string
@@ -45,13 +44,7 @@ export class FilesService {
     private readonly cacheManager: Cache,
     private readonly httpService: HttpService,
     private readonly s3Client: S3Client,
-    // Repositories
-    @InjectRepository(Asset)
-    private readonly filesRepository: Repository<Asset>,
-    @InjectRepository(VideoCover)
-    private readonly videoCoversRepository: Repository<VideoCover>,
-    @InjectRepository(VideoSample)
-    private readonly videoSamplesRepository: Repository<VideoSample>,
+    private readonly fileRepository: FilesRepository,
     configService: ConfigService,
   ) {
     this.logger.setContext(this.constructor.name)
@@ -64,18 +57,6 @@ export class FilesService {
       throw new InternalServerErrorException(
         'S3 Asset bucket name or key prefix is missing',
       )
-    }
-  }
-
-  private getRepository<E extends Asset>(type: FileType): Repository<E> {
-    switch (type) {
-      // TODO impl
-      // case FileType.VideoCover:
-      //   return this.videoCoversRepository
-      // case FileType.VideoSample:
-      //   return this.videoSamplesRepository
-      default:
-        throw new Error(`Invalid FileType (got ${type})`)
     }
   }
 
@@ -125,23 +106,12 @@ export class FilesService {
         throw err
       })
 
-    const fileRecordPromise = this.filesRepository.upsert(
-      {
-        originalName,
-        originalPath,
-        uploadedBucket: bucket,
-        uploadedPath: key,
-      },
-      {
-        skipUpdateIfNoValuesChanged: true,
-        conflictPaths: {
-          originalName: true,
-          originalPath: true,
-          uploadedBucket: true,
-          uploadedPath: true,
-        },
-      },
-    )
+    const fileRecordPromise = this.fileRepository.add(type, {
+      originalName,
+      originalPath,
+      uploadedBucket: bucket,
+      uploadedPath: key,
+    })
 
     fileRecordPromise.catch((err) =>
       this.logger.error(
@@ -149,7 +119,7 @@ export class FilesService {
       ),
     )
 
-    return fileRecordPromise.then((res) => res.raw[0])
+    return fileRecordPromise
   }
 
   async getPreSignedUrl(
@@ -187,7 +157,7 @@ export class FilesService {
     return preSignedUrl
   }
 
-  async _listFiles(bucket: string, prefix?: string): Promise<string[]> {
+  async _listS3Files(bucket: string, prefix?: string): Promise<string[]> {
     let continuationToken: string | undefined = undefined
     const list: string[] = []
 
@@ -222,8 +192,8 @@ export class FilesService {
         this.logger.error(`[Delete][${bucket}:${key}] Failed: ${err}`),
       )
 
-    await this.filesRepository
-      .delete({ uploadedPath: key })
+    await this.fileRepository
+      .deleteByKey(key)
       .catch((err) =>
         this.logger.error(
           `[Delete][${bucket}:${key}] Failed to remove from db ${err}`,
