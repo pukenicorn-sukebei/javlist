@@ -37,6 +37,14 @@ function mockCommon() {
   }
 }
 
+function stubForSlug() {
+  return {
+    fieldToSlug: ':(',
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    slugify: function () {},
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 function videoMakerTitle(): string {
@@ -58,23 +66,28 @@ function personAlias(): string {
 ////////////////////////////////////////////////////////////////////////////////
 
 export function mockVideoMaker(opts: Partial<VideoMaker> = {}): VideoMaker {
-  const maker = new VideoMaker({
+  const _maker: Partial<VideoMaker> = {
+    ...stubForSlug(),
     ...mockCommon(),
-    name: videoMakerTitle(),
+    name: opts.name ?? videoMakerTitle(),
+    slug: opts.slug ?? Faker.lorem.slug(3),
     videos: [],
-  })
+  }
+  const maker = _maker as VideoMaker
 
   maker.videos = opts.videos ?? [mockVideo({ maker })]
 
-  return maker
+  return maker as VideoMaker
 }
 
 export function mockVideoLabel(opts: Partial<VideoLabel> = {}): VideoLabel {
-  const label = new VideoLabel({
+  const _label: Partial<VideoLabel> = {
     ...mockCommon(),
-    name: videoLabelTitle(),
+    name: opts.name ?? videoLabelTitle(),
+    slug: opts.slug ?? Faker.lorem.slug(3),
     videos: [],
-  })
+  }
+  const label = _label as VideoLabel
 
   label.videos = opts.videos ?? [mockVideo({ label })]
 
@@ -82,12 +95,13 @@ export function mockVideoLabel(opts: Partial<VideoLabel> = {}): VideoLabel {
 }
 
 export function mockVideoTag(opts: Partial<VideoTag> = {}): VideoTag {
-  const tag = new VideoTag({
-    id: Faker.datatype.uuid(),
-    name: videoTagTitle(),
-    slug: Faker.lorem.slug(3),
+  const _tag: Partial<VideoTag> = {
+    name: opts.name ?? videoTagTitle(),
+    slug: opts.slug ?? Faker.lorem.slug(3),
     videos: [],
-  })
+  }
+
+  const tag = _tag as VideoTag
 
   tag.videos = opts.videos ?? [mockVideo({ tags: [tag] })]
 
@@ -95,53 +109,70 @@ export function mockVideoTag(opts: Partial<VideoTag> = {}): VideoTag {
 }
 
 export function mockPersonAlias(opts: Partial<PersonAlias> = {}): PersonAlias {
-  return new PersonAlias({
+  const _alias: Partial<PersonAlias> = {
     ...mockCommon(),
-    id: Faker.datatype.uuid(),
-    alias: personAlias(),
-    person: opts.person ?? mockPerson(),
-  })
+    id: opts.id ?? Faker.datatype.uuid(),
+    alias: opts.alias ?? personAlias(),
+    person: {} as any,
+  }
+
+  const alias = _alias as PersonAlias
+
+  alias.person = opts.person ?? mockPerson({ aliases: [alias] })
+
+  return alias
 }
 
 export function mockPerson(opts: Partial<Person> = {}): Person {
-  const person = new Person({
+  const _person: Partial<Person> = {
     ...mockCommon(),
-    aliases: opts.aliases ?? [mockPersonAlias()],
-    alias: 'mock',
+    alias: opts.alias ?? 'mock',
+    aliases: [],
     directed: [],
     starred: [],
-  })
+  }
 
-  person.directed = opts.directed ?? [mockVideo({ directors: [person] })]
-  person.starred = opts.starred ?? [mockVideo({ actors: [person] })]
+  const person = _person as Person
+
+  person.aliases = opts.aliases ?? [mockPersonAlias({ person })]
+  person.directed = opts.directed ?? [
+    mockVideo({ actors: [person], directors: [person] }),
+  ]
+  person.starred = opts.starred ?? [
+    mockVideo({ actors: [person], directors: [person] }),
+  ]
 
   return person
 }
 
 export function mockVideo(opts: Partial<Video> = {}): Video {
-  const video = new Video({
+  const _video: Partial<Video> = {
     ...mockCommon(),
-    type: Faker.helpers.arrayElement(VideoType[Symbol.iterator]),
-    code: Faker.hacker.abbreviation(),
-    title: Faker.commerce.productDescription(),
-    releaseDate: Faker.date.past(),
-    length: Faker.datatype.number(),
+    type: opts.type ?? Faker.helpers.arrayElement(VideoType[Symbol.iterator]),
+    code: opts.code ?? Faker.hacker.abbreviation(),
+    title: opts.title ?? Faker.commerce.productDescription(),
+    releaseDate: opts.releaseDate ?? Faker.date.past(),
+    length: opts.length ?? Faker.datatype.number(),
     // cover: Faker.image.imageUrl(),
     samples: [],
-    maker: undefined,
-    label: undefined,
+    maker: {} as any,
+    label: {} as any,
     tags: [],
     directors: [],
     actors: [],
-  })
+  }
+
+  const video = _video as Video
 
   video.maker = mockVideoMaker({ videos: [video] })
   video.label = opts.label ?? mockVideoLabel({ videos: [video] })
   video.tags = opts.tags ?? [mockVideoTag({ videos: [video] })]
-  video.directors = opts.directors ?? [mockPerson({ directed: [video] })]
+  video.directors = opts.directors ?? [
+    mockPerson({ directed: [video], starred: [video] }),
+  ]
   video.actors = opts.actors ?? [
-    mockPerson({ starred: [video] }),
-    mockPerson({ starred: [video] }),
+    mockPerson({ directed: [video], starred: [video] }),
+    mockPerson({ directed: [video], starred: [video] }),
   ]
 
   return video

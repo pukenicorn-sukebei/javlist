@@ -29,7 +29,7 @@ export abstract class BaseEntityWithSlug implements WithSlug {
 
   @BeforeInsert()
   @BeforeUpdate()
-  private slugify() {
+  slugify() {
     this.slug = slugify(this[this.fieldToSlug])
   }
 }
@@ -59,7 +59,7 @@ export abstract class BaseEntityWithSlugAndTimestamps
 
   @BeforeInsert()
   @BeforeUpdate()
-  private slugify() {
+  public slugify() {
     this.slug = slugify(this[this.fieldToSlug])
   }
 
