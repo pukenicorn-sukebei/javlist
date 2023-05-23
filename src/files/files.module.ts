@@ -5,6 +5,7 @@ import { CacheConfigService } from '@_config-services/cache-config.service'
 import { DatabaseModule } from '@_database/database.module'
 
 import { S3Module } from '../s3.module'
+import { FilesRepository } from './files.repository'
 import { FilesService } from './files.service'
 import { FilesTask } from './files.task'
 
@@ -15,7 +16,7 @@ import { FilesTask } from './files.task'
     DatabaseModule,
     S3Module,
   ],
-  providers: [FilesService, FilesTask],
-  exports: [FilesService],
+  providers: [FilesService, FilesRepository, FilesTask],
+  exports: [FilesService, FilesRepository],
 })
 export class FilesModule {}

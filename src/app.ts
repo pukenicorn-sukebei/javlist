@@ -18,12 +18,14 @@ import Fastify from 'fastify'
 import { FastifyInstance } from 'fastify/types/instance'
 import * as Fs from 'fs'
 import * as Yaml from 'js-yaml'
+import * as process from 'process'
 
 import { AppConfig } from '@_config/app.config'
 import { SwaggerConfig } from '@_config/swagger.config'
-import { PrismaService } from '@_database/prisma.service'
 import { ConfigName } from '@_enum/config'
+import { Env } from '@_enum/env'
 import { LogLevel } from '@_enum/log-level'
+import { Logger } from '@_logger'
 
 import { AppModule } from './app.module'
 // import { SerializerInterceptor } from './utils/serializer.interceptor'
@@ -31,10 +33,15 @@ import validationOptions from './utils/validation-options'
 
 DayJS.extend(DayJS_UTC)
 
+const logger = new Logger()
+logger.setContext('app.ts')
+
 export async function runApp() {
+  logger.log('Initializing')
   const app = await getNestApp()
 
   const appConfig = _getConfig<AppConfig>(app, ConfigName.App)
+  logger.log('Start listening')
   await app.listen(appConfig.port, '0.0.0.0')
 }
 
@@ -53,7 +60,11 @@ function _getConfig<T>(app: INestApplication, configName: ConfigName): T {
 ////////getNestApp////////////////////////////////////////////////////////////////////////
 
 export async function getNestApp(): Promise<INestApplication> {
+  logger.log(`AppEnv is: ${process.env[Env.App.AppEnv]}`)
+
+  logger.log('Initializing fastify')
   const fastify = getFastifyInstance()
+  logger.log('Initializing nestjs')
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(fastify),
@@ -62,14 +73,15 @@ export async function getNestApp(): Promise<INestApplication> {
       bufferLogs: true,
     },
   )
+  logger.log('Setting up container')
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
 
   const appConfig = _getConfig<AppConfig>(app, ConfigName.App)
 
-  const prismaService = app.get(PrismaService)
-  await prismaService.enableShutdownHooks(app)
+  const logLevel = appConfig.logLevel || LogLevel.Log
+  logger.log(`Log level is: ${logLevel}`)
 
-  app.useLogger(getLoggerLogLevel(appConfig))
+  app.useLogger(getLoggerLogLevel(appConfig.logLevel))
   app.setGlobalPrefix(appConfig.apiPrefix)
   app.enableVersioning({
     type: VersioningType.URI,
@@ -86,10 +98,10 @@ function getFastifyInstance(): FastifyInstance {
   return Fastify()
 }
 
-function getLoggerLogLevel(appConfig: AppConfig) {
+function getLoggerLogLevel(logLevel: LogLevel) {
   const logLevels: LogLevel[] = []
   // noinspection FallThroughInSwitchStatementJS
-  switch (appConfig.logLevel) {
+  switch (logLevel) {
     case LogLevel.Verbose:
       logLevels.push(LogLevel.Verbose)
     case LogLevel.Debug:

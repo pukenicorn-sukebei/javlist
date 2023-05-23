@@ -1,4 +1,7 @@
 {
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  },
   "compilerOptions": {
     "module": "commonjs",
     "declaration": true,
@@ -6,7 +9,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2022",
+    "target": "esnext",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./src",
@@ -30,17 +33,17 @@
       "@_config/*": [
         "config/*"
       ],
-      "@_enum/*": [
-        "enum/*"
-      ],
       "@_database/*": [
         "database/*"
       ],
-      "@_generated/*": [
-        "../generated/*"
+      "@_enum/*": [
+        "enum/*"
       ],
       "@_logger": [
         "logger"
+      ],
+      "@_models": [
+        "models"
       ],
       "@_utils/*": [
         "utils/*"

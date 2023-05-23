@@ -1,11 +1,23 @@
-import { IPaginationOptions } from '@_utils/types/pagination-options'
+import { snakeCase } from 'typeorm/util/StringUtils'
 
-export function paginationOptionsToPrismaPaginationArgs(
+import {
+  IPaginationOptions,
+  IPaginationQueryOptions,
+} from '@_utils/types/pagination-options'
+
+export function paginationOptionsToQueryArgs(
   options: IPaginationOptions,
-): {
-  take?: number
-  skip?: number
-} {
+  defaultSort?: string,
+): IPaginationQueryOptions {
+  return {
+    ...paginationOptionsToQueryPaginationArgs(options),
+    ...paginationOptionsToQuerySortByArgs(options, defaultSort),
+  }
+}
+
+export function paginationOptionsToQueryPaginationArgs(
+  options: IPaginationOptions,
+): Pick<IPaginationQueryOptions, 'take' | 'skip'> {
   const { amount = 20, page = 1 } = options
   return {
     take: amount,
@@ -13,12 +25,12 @@ export function paginationOptionsToPrismaPaginationArgs(
   }
 }
 
-export function paginationOptionsToPrismaSortByArgs(
+export function paginationOptionsToQuerySortByArgs(
   options: IPaginationOptions,
   defaultValue?: string,
-): { orderBy?: any } {
+): Pick<IPaginationQueryOptions, 'orderBy'> {
   const order = options.order || defaultValue
-  if (!order || order === '') {
+  if (!order) {
     return {}
   }
 
@@ -26,11 +38,12 @@ export function paginationOptionsToPrismaSortByArgs(
   const orderItems = order.split(',')
   for (let item of orderItems) {
     item = item.trim()
-    let value = 'asc'
+    let value = 'ASC'
     if (item.startsWith('-')) {
-      value = 'desc'
+      value = 'DESC'
       item = item.substring(1)
     }
+    item = snakeCase(item)
 
     const keys = item.split('.')
     const lastKey = keys.splice(keys.length - 1, 1)[0].trim()

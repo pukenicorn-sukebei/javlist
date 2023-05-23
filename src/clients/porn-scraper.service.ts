@@ -3,7 +3,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common'
-import { JAVResult, JavApi } from '@pukenicorn-sukebei/porn-scraper-client'
+import {
+  LookupApi,
+  ScrapedResult,
+} from '@pukenicorn-sukebei/porn-scraper-client'
 import { AxiosError, AxiosResponse } from 'axios'
 
 import { Logger } from '@_logger'
@@ -12,15 +15,15 @@ import { Logger } from '@_logger'
 export class PornScraperService {
   constructor(
     private readonly logger: Logger,
-    private readonly javScraperClient: JavApi,
+    private readonly javScraperClient: LookupApi,
   ) {
     logger.setContext(PornScraperService.name)
   }
 
-  getByCode(code: string): Promise<AxiosResponse<JAVResult>> {
+  getByCode(code: string): Promise<AxiosResponse<ScrapedResult>> {
     return this.javScraperClient
-      .lookupJavCodeGet(code)
-      .then((resp) => resp as AxiosResponse<JAVResult>)
+      .lookupLookupCodeGet(code)
+      .then((resp) => resp as AxiosResponse<ScrapedResult>)
       .catch((err) => {
         if (err instanceof AxiosError && err.response?.status) {
           this.logger.error(`[PornScraper][${code}] Failed: ${err}`)
@@ -30,7 +33,7 @@ export class PornScraperService {
             )
           }
         }
-        throw new InternalServerErrorException(null, err)
+        throw new InternalServerErrorException(err)
       })
   }
 }

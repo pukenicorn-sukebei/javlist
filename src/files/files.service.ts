@@ -20,11 +20,13 @@ import * as Path from 'path'
 import * as UUID from 'uuid'
 
 import { S3Config } from '@_config/s3.config'
-import { PrismaService } from '@_database/prisma.service'
 import { ConfigName } from '@_enum/config'
-import { File, FileType, Prisma } from '@_generated/prisma'
 import { Logger } from '@_logger'
+import { Asset } from '@_models'
 import * as UrlUtils from '@_utils/url'
+
+import { FileType } from './file-type.enum'
+import { FilesRepository } from './files.repository'
 
 export interface IFileUploadMeta {
   originalName?: string
@@ -41,8 +43,8 @@ export class FilesService {
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     private readonly httpService: HttpService,
-    private readonly prisma: PrismaService,
     private readonly s3Client: S3Client,
+    private readonly fileRepository: FilesRepository,
     configService: ConfigService,
   ) {
     this.logger.setContext(this.constructor.name)
@@ -58,7 +60,7 @@ export class FilesService {
     }
   }
 
-  async uploadAssetFromUrl(type: FileType, url: string): Promise<File> {
+  async uploadAssetFromUrl(type: FileType, url: string): Promise<Asset> {
     return this.uploadFromUrl(
       type,
       this.s3Config.buckets.asset.name!,
@@ -67,16 +69,12 @@ export class FilesService {
     )
   }
 
-  async getAssetPreSignedUrl(key: string, age?: number): Promise<string> {
-    return this.getPreSignedUrl(this.s3Config.buckets.asset.name!, key, age)
-  }
-
   async uploadFromUrl(
     type: FileType,
     bucket: string,
     keyPrefix: string,
     url: string,
-  ): Promise<File> {
+  ): Promise<Asset> {
     const data = await this.httpService.axiosRef
       .get(url, { responseType: 'arraybuffer' })
       .then((response) => Buffer.from(response.data, 'binary'))
@@ -97,7 +95,7 @@ export class FilesService {
     key: string,
     data: PutObjectRequest['Body'] | string | Uint8Array | Buffer,
     { originalName, originalPath }: IFileUploadMeta = {},
-  ): Promise<File> {
+  ): Promise<Asset> {
     this.logger.verbose(`[Upload][${bucket}:${key}] Uploading`)
 
     await this.s3Client
@@ -108,21 +106,11 @@ export class FilesService {
         throw err
       })
 
-    const params: Prisma.XOR<
-      Prisma.FileCreateInput,
-      Prisma.FileUncheckedCreateInput
-    > = {
-      type,
+    const fileRecordPromise = this.fileRepository.add(type, {
       originalName,
       originalPath,
       uploadedBucket: bucket,
       uploadedPath: key,
-    }
-
-    const fileRecordPromise = this.prisma.file.upsert({
-      where: { type_uploadedPath: { type, uploadedPath: key } },
-      create: params,
-      update: params,
     })
 
     fileRecordPromise.catch((err) =>
@@ -169,7 +157,7 @@ export class FilesService {
     return preSignedUrl
   }
 
-  async _listFiles(bucket: string, prefix?: string): Promise<string[]> {
+  async _listS3Files(bucket: string, prefix?: string): Promise<string[]> {
     let continuationToken: string | undefined = undefined
     const list: string[] = []
 
@@ -204,8 +192,8 @@ export class FilesService {
         this.logger.error(`[Delete][${bucket}:${key}] Failed: ${err}`),
       )
 
-    await this.prisma.file
-      .delete({ where: { uploadedPath: key } })
+    await this.fileRepository
+      .deleteByKey(key)
       .catch((err) =>
         this.logger.error(
           `[Delete][${bucket}:${key}] Failed to remove from db ${err}`,
