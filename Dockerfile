@@ -31,7 +31,6 @@ COPY tsconfig*.json ./
 
 COPY --from=dependencies /app/node_modules /app/node_modules
 
-COPY prisma ./prisma
 COPY src ./src
 
 RUN yarn generate && yarn build
@@ -42,7 +41,6 @@ FROM base as output
 
 COPY .env.default .
 COPY --from=dependencies /app/prod_modules /app/node_modules
-COPY prisma ./prisma
 COPY --from=builder /app/generated /app/generated
 COPY --from=builder /app/dist /app/dist
 
