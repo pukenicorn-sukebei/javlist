@@ -1,5 +1,6 @@
 import { HttpModule } from '@nestjs/axios'
-import { CacheModule, Module } from '@nestjs/common'
+import { CacheModule } from '@nestjs/cache-manager'
+import { Module } from '@nestjs/common'
 
 import { CacheConfigService } from '@_config-services/cache-config.service'
 import { DatabaseModule } from '@_database/database.module'
