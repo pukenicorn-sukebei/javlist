@@ -11,7 +11,7 @@ import { TypeOrmLogger } from '@_logger'
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
-  private static ACCEPTED_DB_TYPE = ['mssql', 'mysql', 'mariadb', 'postgres']
+  private static ACCEPTED_DB_TYPE = ['mysql', 'mariadb', 'postgres']
 
   private readonly appConfig: AppConfig
   private readonly dbConfig: DbConfig
@@ -46,9 +46,6 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
     let dbPort = this.dbConfig.port
     if (isNaN(dbPort)) {
       switch (dbType) {
-        case 'mssql':
-          dbPort = 1433
-          break
         case 'mysql':
         case 'mariadb':
           dbPort = 3306
@@ -60,7 +57,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
     }
 
     return {
-      type: dbType as 'mssql' | 'mysql' | 'mariadb' | 'postgres',
+      type: dbType as 'mysql' | 'mariadb' | 'postgres',
       host: this.dbConfig.host,
       port: dbPort,
       username: this.dbConfig.username,
