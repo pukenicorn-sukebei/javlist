@@ -18,6 +18,7 @@ import Fastify from 'fastify'
 import { FastifyInstance } from 'fastify/types/instance'
 import * as Fs from 'fs'
 import * as Yaml from 'js-yaml'
+import * as Path from 'path'
 import * as process from 'process'
 
 import { AppConfig } from '@_config/app.config'
@@ -131,6 +132,9 @@ function setupSwagger(app: INestApplication): void {
     SwaggerModule.setup(swaggerConfig.path, app, document)
 
     if (swaggerConfig.filePath) {
+      const dirPath = Path.dirname(swaggerConfig.filePath)
+      Fs.mkdirSync(dirPath, { recursive: true })
+
       Fs.writeFileSync(swaggerConfig.filePath, Yaml.dump(document))
     }
   }

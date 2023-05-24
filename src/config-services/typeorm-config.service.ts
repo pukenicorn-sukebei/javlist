@@ -84,12 +84,29 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
     }
   }
 
+  private getCliOptions(): Partial<TypeOrmModuleOptions> {
+    return {
+      type: 'sqlite',
+      database: ':memory:',
+      dropSchema: true,
+      synchronize: true,
+    }
+  }
+
+  private getOptionsByEnv(env: string): Partial<TypeOrmModuleOptions> {
+    switch (env) {
+      case 'cli':
+        return this.getCliOptions()
+      case 'test':
+        return this.getTestOptions()
+      default:
+        return this.getOptions()
+    }
+  }
+
   createTypeOrmOptions(): TypeOrmModuleOptions {
     const baseOptions = this.getBaseOptions()
-    const envOptions =
-      this.appConfig.appEnv === 'test'
-        ? this.getTestOptions()
-        : this.getOptions()
+    const envOptions = this.getOptionsByEnv(this.appConfig.appEnv)
 
     return {
       ...baseOptions,
