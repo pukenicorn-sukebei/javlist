@@ -30,12 +30,6 @@ import { VideosModule } from './videos/videos.module'
       useClass: TypeOrmConfigService,
     }),
     VideosModule.register(),
-    // GraphQLModule.forRootAsync<MercuriusDriverConfig>({
-    //   driver: MercuriusDriver,
-    //   imports: [FilesModule, VideosModule.register()],
-    //   useClass: GraphqlConfigService,
-    //   inject: [VideosService],
-    // }),
   ],
 })
 export class AppModule implements OnModuleInit {
