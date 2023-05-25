@@ -22,7 +22,7 @@ export class FilesTask extends BaseTask {
     schedulerRegistry: SchedulerRegistry,
     configService: ConfigService,
   ) {
-    super(logger, schedulerRegistry)
+    super(logger, schedulerRegistry, configService)
 
     this.s3Config = configService.get<S3Config>(ConfigName.S3)!
     const cronConfig = configService.get<CronConfig>(ConfigName.Cron)!

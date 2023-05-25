@@ -3,6 +3,7 @@ import { registerAs } from '@nestjs/config'
 import { ConfigName } from '@_enum/config'
 import { Env } from '@_enum/env'
 import { LogLevel, parseLogLevel } from '@_enum/log-level'
+import { parseBool } from '@_utils/parsers'
 
 export class AppConfig {
   constructor(data: Partial<AppConfig>) {
@@ -16,6 +17,7 @@ export class AppConfig {
   port: number
   apiPrefix: string
   logLevel: LogLevel
+  cronJobEnabled: boolean
 }
 
 export default registerAs<AppConfig>(
@@ -32,5 +34,6 @@ export default registerAs<AppConfig>(
       ),
       apiPrefix: process.env[Env.App.ApiPrefix],
       logLevel: parseLogLevel(process.env[Env.App.LogLevel]),
+      cronJobEnabled: parseBool(process.env[Env.App.CronJobsEnabled]),
     }),
 )
