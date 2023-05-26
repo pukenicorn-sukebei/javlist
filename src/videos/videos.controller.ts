@@ -31,6 +31,10 @@ export class VideosController {
     pagination: PaginationDto,
     @Query('codes', new ParseArrayPipe(parseOptionalStringArrayOptions))
     codes?: string[],
+    @Query('actors', new ParseArrayPipe(parseOptionalStringArrayOptions))
+    actors?: string[],
+    @Query('directors', new ParseArrayPipe(parseOptionalStringArrayOptions))
+    directors?: string[],
     @Query('tags', new ParseArrayPipe(parseOptionalStringArrayOptions))
     tags?: string[],
     @Query('makers', new ParseArrayPipe(parseOptionalStringArrayOptions))
@@ -40,7 +44,7 @@ export class VideosController {
   ): Promise<VideoDto[]> {
     // noinspection ES6MissingAwait
     const videos = await this.videosService.getVideos(
-      { codes, tags, makers, labels },
+      { codes, actors, directors, tags, makers, labels },
       pagination,
     )
 
