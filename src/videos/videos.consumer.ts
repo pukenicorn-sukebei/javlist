@@ -154,12 +154,12 @@ export class VideosConsumer {
     video.samples = await samplesPromise
     video.length = data.length ?? undefined
     video.actors = await actorsPromise
+    video.directors = await directorsPromise
     video.tags = await tagsPromise
     video.maker = (await makerPromise) ?? undefined
     video.label = (await labelPromise) ?? undefined
 
-    const x = await this.videoRepository.save(video)
-    return x
+    return this.videoRepository.save(video)
   }
 
   //////////////////////////////////////////////////////////////////////////////
