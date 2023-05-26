@@ -3,10 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { In, Repository } from 'typeorm'
 
 import { Video, VideoLabel, VideoMaker, VideoTag } from '@_models'
+import { queryToSlugQuery } from '@_utils/query'
 import { slugify } from '@_utils/slug'
 import { IPaginationQueryOptions } from '@_utils/types/pagination-options'
 
 export type QueryOptions = {
+  actors?: string | string[]
+  directors?: string | string[]
   codes?: string | string[]
   tags?: string | string[]
   makers?: string | string[]
@@ -60,32 +63,20 @@ export class VideosRepository {
   ) {
     return this.videoRepository.find({
       where: {
-        code:
-          query.codes &&
-          (Array.isArray(query.codes)
+        code: query.codes
+          ? Array.isArray(query.codes)
             ? In(query.codes.map((x) => x.toUpperCase()))
-            : query.codes.toUpperCase()),
-        tags: query.tags
-          ? {
-              slug: Array.isArray(query.tags)
-                ? In(query.tags.map((x) => slugify(x)))
-                : slugify(query.tags),
-            }
+            : query.codes.toUpperCase()
           : undefined,
-        maker: query.makers
-          ? {
-              slug: Array.isArray(query.makers)
-                ? In(query.makers.map((x) => slugify(x)))
-                : slugify(query.makers),
-            }
+        actors: query.actors
+          ? { aliases: queryToSlugQuery(query.actors) }
           : undefined,
-        label: query.labels
-          ? {
-              slug: Array.isArray(query.labels)
-                ? In(query.labels.map((x) => slugify(x)))
-                : slugify(query.labels),
-            }
+        directors: query.directors
+          ? { aliases: queryToSlugQuery(query.directors) }
           : undefined,
+        tags: query.tags ? queryToSlugQuery(query.tags) : undefined,
+        maker: query.makers ? queryToSlugQuery(query.makers) : undefined,
+        label: query.labels ? queryToSlugQuery(query.labels) : undefined,
       },
 
       loadEagerRelations: populate,
