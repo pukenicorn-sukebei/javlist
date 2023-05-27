@@ -22,7 +22,7 @@ export enum VideoType {
 
 @Entity()
 export class Video extends BaseEntityWithTimestamps {
-  @Column()
+  @Column({ type: 'enum', enum: VideoType })
   type: VideoType
 
   @Column({ unique: true })

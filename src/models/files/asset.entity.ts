@@ -6,6 +6,8 @@ import { BaseEntityWithTimestamps } from '../base.entity'
 @Unique(['type', 'uploadedBucket', 'uploadedPath'])
 @TableInheritance({ column: 'type' })
 export abstract class Asset extends BaseEntityWithTimestamps {
+  protected static readonly JOIN_COLUMN_NAME = 'owner_id'
+
   @Column()
   readonly type: string
 

@@ -6,6 +6,6 @@ import { Asset } from './asset.entity'
 @ChildEntity()
 export class VideoSample extends Asset {
   @ManyToOne(() => Video, (video) => video.samples)
-  @JoinColumn({ name: 'owner_id' })
+  @JoinColumn({ name: Asset.JOIN_COLUMN_NAME })
   video: Video
 }

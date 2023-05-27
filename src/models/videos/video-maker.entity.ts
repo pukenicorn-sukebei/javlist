@@ -6,7 +6,7 @@ import { Video } from './video.entity'
 @Entity()
 export class VideoMaker extends BaseEntityWithSlugAndTimestamps {
   constructor() {
-    super('name')
+    super({ fieldToSlug: 'name' })
   }
 
   @Column({ unique: true })
