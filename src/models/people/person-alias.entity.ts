@@ -5,9 +5,8 @@ import { Person } from './person.entity'
 
 @Entity()
 export class PersonAlias extends BaseEntityWithSlugAndTimestamps {
-  constructor(data: Partial<PersonAlias> = {}) {
+  constructor() {
     super('alias')
-    Object.assign(this, data)
   }
 
   @Column({ unique: true })

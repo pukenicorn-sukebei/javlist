@@ -5,9 +5,8 @@ import { Video } from './video.entity'
 
 @Entity()
 export class VideoLabel extends BaseEntityWithSlugAndTimestamps {
-  constructor(data: Partial<VideoLabel> = {}) {
+  constructor() {
     super('name')
-    Object.assign(this, data)
   }
 
   @Column({ unique: true })

@@ -6,11 +6,6 @@ import { BaseEntityWithTimestamps } from '../base.entity'
 @Unique(['type', 'uploadedBucket', 'uploadedPath'])
 @TableInheritance({ column: 'type' })
 export abstract class Asset extends BaseEntityWithTimestamps {
-  protected constructor(data: Partial<Asset> = {}) {
-    super()
-    Object.assign(this, data)
-  }
-
   @Column()
   readonly type: string
 

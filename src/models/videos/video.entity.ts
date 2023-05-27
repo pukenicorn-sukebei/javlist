@@ -22,11 +22,6 @@ export enum VideoType {
 
 @Entity()
 export class Video extends BaseEntityWithTimestamps {
-  constructor(data: Partial<Video> = {}) {
-    super()
-    Object.assign(this, data)
-  }
-
   @Column()
   type: VideoType
 
