@@ -63,10 +63,6 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       username: this.dbConfig.username,
       password: this.dbConfig.password,
       database: this.dbConfig.name,
-      migrations:
-        this.appConfig.appEnv === 'typeorm-cli'
-          ? [Path.join(process.cwd(), 'migrations', '*.ts')]
-          : undefined,
       namingStrategy: new SnakeNamingStrategy(),
       logger: this.logger,
     }
@@ -84,7 +80,8 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
   private getCliOptions(): Partial<TypeOrmModuleOptions> {
     return {
       type: 'sqlite',
-      database: ':memory:',
+      database: './.dev/db.sqlite3',
+      migrations: [Path.join(process.cwd(), 'migrations', '*.ts')],
       dropSchema: true,
       synchronize: true,
     }
