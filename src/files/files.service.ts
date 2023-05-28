@@ -193,7 +193,7 @@ export class FilesService {
       )
 
     await this.fileRepository
-      .deleteByKey(key)
+      .deleteByKey(bucket, key)
       .catch((err) =>
         this.logger.error(
           `[Delete][${bucket}:${key}] Failed to remove from db ${err}`,

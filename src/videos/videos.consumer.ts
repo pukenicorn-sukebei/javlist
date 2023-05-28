@@ -134,12 +134,25 @@ export class VideosConsumer {
       ),
     )
 
-    await Promise.all(allPromises)
-
-    const video = await this.videoRepository.findByCode(data.code, {
+    const videoPromise = this.videoRepository.findByCode(data.code, {
       loadRelation: true,
       initOnNotFound: true,
     })
+
+    const cleanupPromise = [
+      videoPromise.then((video) => {
+        if (video.cover) {
+          return this.filesService._delete(
+            video.cover.uploadedBucket,
+            video.cover.uploadedPath,
+          )
+        }
+      }),
+    ]
+
+    await Promise.all(allPromises)
+
+    const video = await videoPromise
 
     if (!video) {
       throw new InternalServerErrorException(
@@ -158,6 +171,8 @@ export class VideosConsumer {
     video.tags = await tagsPromise
     video.maker = (await makerPromise) ?? undefined
     video.label = (await labelPromise) ?? undefined
+
+    await Promise.all(cleanupPromise)
 
     return this.videoRepository.save(video)
   }

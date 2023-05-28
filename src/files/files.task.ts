@@ -86,10 +86,10 @@ export class FilesTask extends BaseTask {
       await Promise.all([
         s3Orphans.map((fileKey) => this.filesService._delete(bucket, fileKey)),
         dbOrphans.map((file) =>
-          this.fileRepository.deleteByKey(file.uploadedPath),
+          this.fileRepository.deleteByKey(file.uploadedBucket, file.uploadedPath),
         ),
         dbInvalidFileList.map((file) =>
-          this.fileRepository.deleteByKey(file.uploadedPath),
+          this.fileRepository.deleteByKey(file.uploadedBucket, file.uploadedPath),
         ),
       ])
       this.logger.debug(`[cleanUpOrphanAssets] Done`)

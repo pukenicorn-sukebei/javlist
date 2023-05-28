@@ -38,8 +38,11 @@ export class FilesRepository {
     }
   }
 
-  async deleteByKey(key: string) {
-    return this.assetRepository.delete({ uploadedPath: key })
+  async deleteByKey(bucket: string, key: string) {
+    return this.assetRepository.delete({
+      uploadedBucket: bucket,
+      uploadedPath: key,
+    })
   }
 
   async _list(): Promise<Asset[]> {
