@@ -12,6 +12,6 @@ export class VideoLabel extends BaseEntityWithSlugAndTimestamps {
   @Column({ unique: true })
   name: string
 
-  @OneToMany(() => Video, (video) => video.label, { cascade: true })
+  @OneToMany(() => Video, (video) => video.label)
   videos: Video[]
 }
