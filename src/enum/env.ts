@@ -6,6 +6,7 @@ enum App {
   AppPort = 'APP_PORT',
   ApiPrefix = 'API_PREFIX',
   LogLevel = 'APP_LOG_LEVEL',
+  CronJobsEnabled = 'CRON_JOBS_ENABLED',
 }
 
 enum Cron {

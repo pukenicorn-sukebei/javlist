@@ -5,9 +5,8 @@ import { Video } from './video.entity'
 
 @Entity()
 export class VideoTag extends BaseEntityWithSlug {
-  constructor(data: Partial<VideoTag> = {}) {
-    super('name')
-    Object.assign(this, data)
+  constructor() {
+    super({ fieldToSlug: 'name' })
   }
 
   @Column({ unique: true })

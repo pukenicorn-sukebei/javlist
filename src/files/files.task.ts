@@ -22,7 +22,7 @@ export class FilesTask extends BaseTask {
     schedulerRegistry: SchedulerRegistry,
     configService: ConfigService,
   ) {
-    super(logger, schedulerRegistry)
+    super(logger, schedulerRegistry, configService)
 
     this.s3Config = configService.get<S3Config>(ConfigName.S3)!
     const cronConfig = configService.get<CronConfig>(ConfigName.Cron)!
@@ -86,10 +86,10 @@ export class FilesTask extends BaseTask {
       await Promise.all([
         s3Orphans.map((fileKey) => this.filesService._delete(bucket, fileKey)),
         dbOrphans.map((file) =>
-          this.fileRepository.deleteByKey(file.uploadedPath),
+          this.fileRepository.deleteByKey(file.uploadedBucket, file.uploadedPath),
         ),
         dbInvalidFileList.map((file) =>
-          this.fileRepository.deleteByKey(file.uploadedPath),
+          this.fileRepository.deleteByKey(file.uploadedBucket, file.uploadedPath),
         ),
       ])
       this.logger.debug(`[cleanUpOrphanAssets] Done`)

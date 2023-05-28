@@ -5,12 +5,9 @@ import { Asset } from './asset.entity'
 
 @ChildEntity()
 export class VideoCover extends Asset {
-  constructor(data: Partial<VideoCover> = {}) {
-    super()
-    Object.assign(this, data)
-  }
-
-  @OneToOne(() => Video, (video) => video.cover)
-  @JoinColumn({ name: 'owner_id' })
+  @OneToOne(() => Video, (video) => video.cover, {
+    orphanedRowAction: 'delete',
+  })
+  @JoinColumn({ name: Asset.JOIN_COLUMN_NAME })
   video: Video
 }

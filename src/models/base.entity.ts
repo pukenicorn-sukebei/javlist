@@ -18,8 +18,12 @@ export interface WithTimestamps {
   updatedAt: Date
 }
 
+export type WithSlugOptions = {
+  fieldToSlug: string
+}
+
 export abstract class BaseEntityWithSlug implements WithSlug {
-  protected constructor(private readonly fieldToSlug: string) {}
+  protected constructor(private readonly opts: WithSlugOptions) {}
 
   @PrimaryGeneratedColumn('uuid')
   id: string
@@ -30,7 +34,7 @@ export abstract class BaseEntityWithSlug implements WithSlug {
   @BeforeInsert()
   @BeforeUpdate()
   slugify() {
-    this.slug = slugify(this[this.fieldToSlug])
+    this.slug = slugify(this[this.opts.fieldToSlug])
   }
 }
 
@@ -48,7 +52,7 @@ export abstract class BaseEntityWithTimestamps implements WithTimestamps {
 export abstract class BaseEntityWithSlugAndTimestamps
   implements WithSlug, WithTimestamps
 {
-  protected constructor(private readonly fieldToSlug: string) {}
+  protected constructor(private readonly opts: WithSlugOptions) {}
 
   @PrimaryGeneratedColumn('uuid')
   id: string
@@ -60,7 +64,7 @@ export abstract class BaseEntityWithSlugAndTimestamps
   @BeforeInsert()
   @BeforeUpdate()
   public slugify() {
-    this.slug = slugify(this[this.fieldToSlug])
+    this.slug = slugify(this[this.opts.fieldToSlug])
   }
 
   // WithTimestamps
