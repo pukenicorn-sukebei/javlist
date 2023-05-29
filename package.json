@@ -75,7 +75,7 @@
     "@faker-js/faker": "^7.6.0",
     "@nestjs/cli": "^9.4.2",
     "@nestjs/schematics": "^9.2.0",
-    "@nestjs/testing": "^9.3.12",
+    "@nestjs/testing": "^9.4.2",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/cache-manager": "^4.0.2",
     "@types/cron": "^2.0.1",
